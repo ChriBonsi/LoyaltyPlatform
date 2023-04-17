@@ -4,10 +4,17 @@
 *Progetto IDS - Loyalty Platform.vpp.bak_002d
 *Progetto IDS - Loyalty Platform.vpp.bak_003d
 *Progetto IDS - Loyalty Platform.vpp.bak_004d
+*Progetto IDS - Loyalty Platform.vpp.bak_005d
+*Progetto IDS - Loyalty Platform.vpp.bak_006d
+*Progetto IDS - Loyalty Platform.vpp.bak_007d
+*Progetto IDS - Loyalty Platform.vpp.bak_008d
 
 # Intellij folders
 LoyaltyPlatform/.gradle
 LoyaltyPlatform/.idea
+
+#IML file
+LoyaltyPlatform/LoyaltyPlatform.iml
 
 
 # User-specific stuff
