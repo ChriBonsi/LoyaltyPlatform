@@ -14,9 +14,13 @@
 *Progetto IDS - Loyalty Platform.vux
 
 
-# Intellij folders
-LoyaltyPlatform/.gradle
+# Intellij folders and files
+LoyaltyPlatform/src/test
+LoyaltyPlatform/.mvn
 LoyaltyPlatform/.idea
+LoyaltyPlatform/mvnw
+LoyaltyPlatform/mvnw.cmd
+LoyaltyPlatform/HELP.md
 
 #IML file
 LoyaltyPlatform/LoyaltyPlatform.iml
