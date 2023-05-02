@@ -3,21 +3,39 @@ package it.unicam.cs.ids.models;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 
+import java.sql.Date;
 import java.util.Objects;
 
 @Entity
 public class Tessera {
     @Id
     @GeneratedValue
-    private String idTessera;
-    private int punteggio;
-    private int livello;
+    private Integer id;
+    private Integer punteggio;
+    private Integer livello;
+    private Date dataCreazione;
 
-    public Tessera(String idTessera, int punteggio, int livello) {
-        this.idTessera = idTessera;
+    @OneToOne(mappedBy = "tessera")
+    private Cliente cliente;
+
+    public Tessera(Integer id, Integer punteggio, Integer livello, Date dataCreazione) {
+        this.id = id;
         this.punteggio = punteggio;
         this.livello = livello;
+        this.dataCreazione = dataCreazione;
+    }
+
+    public Tessera() {
+    }
+
+    public static Tessera inizializzaNuovaTessera() {
+        Tessera tessera = new Tessera();
+        tessera.setPunteggio(0);
+        tessera.setLivello(0);
+        tessera.setDataCreazione(new Date(System.currentTimeMillis()));
+        return tessera;
     }
 
     @Override
@@ -25,25 +43,24 @@ public class Tessera {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Tessera tessera = (Tessera) o;
-        return Objects.equals(idTessera, tessera.idTessera) && Objects.equals(livello, tessera.livello) && Objects.equals(punteggio, tessera.punteggio);
+        return Objects.equals(id, tessera.id) && Objects.equals(livello, tessera.livello) && Objects.equals(punteggio, tessera.punteggio) && Objects.equals(dataCreazione, tessera.dataCreazione);
     }
+
     @Override
-    public int hashCode(){return Objects.hash(idTessera, punteggio, livello); }
+    public int hashCode() {
+        return Objects.hash(id, punteggio, livello, dataCreazione);
+    }
 
     public String toString() {
-        return "Tessera{" +
-                "idTessera=" + idTessera +
-                ", punteggio='" + punteggio + '\'' +
-                ", livello='" + livello + '\'' +
-                '}';
+        return "Tessera{" + "idTessera=" + id + ", punteggio='" + punteggio + '\'' + ", livello='" + livello + '\'' + ", dataCreazione='" + dataCreazione + '\'' + '}';
     }
 
-    public String getIdTessera() {
-        return idTessera;
+    public Integer getId() {
+        return id;
     }
 
-    public void setIdTessera(String idTessera) {
-        this.idTessera = idTessera;
+    public void setId(Integer idTessera) {
+        this.id = idTessera;
     }
 
     public int getPunteggio() {
@@ -60,5 +77,13 @@ public class Tessera {
 
     public void setLivello(int livello) {
         this.livello = livello;
+    }
+
+    public Date getDataCreazione() {
+        return dataCreazione;
+    }
+
+    public void setDataCreazione(Date dataCreazione) {
+        this.dataCreazione = dataCreazione;
     }
 }

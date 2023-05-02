@@ -1,18 +1,18 @@
 package it.unicam.cs.ids.models;
 
-import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 
-import java.util.Date;
+import java.sql.Date;
 import java.util.Objects;
 
-@Entity
+
 public class Offerta {
+
     @Id
     @GeneratedValue
-    private int id;
-    private int livello;
+    private Integer id;
+    private Integer livello;
 
     //yyyy-[m]m-[d]d
     private Date dataInizio;
@@ -24,6 +24,10 @@ public class Offerta {
         this.dataInizio = dataInizio;
         this.dataScadenza = dataScadenza;
     }
+
+    public Offerta() {
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -31,16 +35,14 @@ public class Offerta {
         Offerta offerta = (Offerta) o;
         return Objects.equals(id, offerta.id) && Objects.equals(livello, offerta.livello) && Objects.equals(dataInizio, offerta.dataInizio) && Objects.equals(dataScadenza, offerta.dataScadenza);
     }
+
     @Override
-    public int hashCode(){return Objects.hash(id, livello, dataInizio, dataScadenza); }
+    public int hashCode() {
+        return Objects.hash(id, livello, dataInizio, dataScadenza);
+    }
 
     public String toString() {
-        return "Offerta{" +
-                "id=" + id +
-                ", livello='" + livello + '\'' +
-                ", dataInizio='" + dataInizio + '\'' +
-                ", dataScadenza='" + dataScadenza + '\'' +
-                '}';
+        return "Offerta{" + "id=" + id + ", livello='" + livello + '\'' + ", dataInizio='" + dataInizio + '\'' + ", dataScadenza='" + dataScadenza + '\'' + '}';
     }
 
     public int getId() {

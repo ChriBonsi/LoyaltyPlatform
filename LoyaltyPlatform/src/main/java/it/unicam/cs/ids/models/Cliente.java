@@ -1,8 +1,6 @@
 package it.unicam.cs.ids.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.sql.Date;
 import java.util.Objects;
@@ -20,7 +18,9 @@ public class Cliente {
 
     //yyyy-[m]m-[d]d
     private Date dataNascita;
-    private final String idTessera = "C" + String.format("%08d", id);
+
+    @OneToOne(cascade = CascadeType.ALL)
+    private Tessera tessera;
 
     public Cliente(Long id, String nome, String cognome, String email, String numeroTelefono, Date dataNascita) {
         this.id = id;
@@ -40,25 +40,17 @@ public class Cliente {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Cliente cliente = (Cliente) o;
-        return Objects.equals(id, cliente.id) && Objects.equals(nome, cliente.nome) && Objects.equals(cognome, cliente.cognome) && Objects.equals(email, cliente.email) && Objects.equals(numeroTelefono, cliente.numeroTelefono) && Objects.equals(dataNascita, cliente.dataNascita) && Objects.equals(idTessera, cliente.idTessera);
+        return Objects.equals(id, cliente.id) && Objects.equals(nome, cliente.nome) && Objects.equals(cognome, cliente.cognome) && Objects.equals(email, cliente.email) && Objects.equals(numeroTelefono, cliente.numeroTelefono) && Objects.equals(dataNascita, cliente.dataNascita);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, nome, cognome, email, numeroTelefono, dataNascita, idTessera);
+        return Objects.hash(id, nome, cognome, email, numeroTelefono, dataNascita);
     }
 
     @Override
     public String toString() {
-        return "Cliente{" +
-                "id=" + id +
-                ", nome='" + nome + '\'' +
-                ", cognome='" + cognome + '\'' +
-                ", email='" + email + '\'' +
-                ", numeroTelefono='" + numeroTelefono + '\'' +
-                ", dataNascita=" + dataNascita +
-                ", idTessera='" + idTessera + '\'' +
-                '}';
+        return "Cliente{" + "id=" + id + ", nome='" + nome + '\'' + ", cognome='" + cognome + '\'' + ", email='" + email + '\'' + ", numeroTelefono='" + numeroTelefono + '\'' + ", dataNascita=" + dataNascita + '\'' + '}';
     }
 
     public Long getId() {
@@ -109,8 +101,11 @@ public class Cliente {
         this.dataNascita = dataNascita;
     }
 
-    public String getIdTessera() {
-        return idTessera;
+    public Tessera getTessera() {
+        return tessera;
+    }
+
+    public void setTessera(Tessera tessera) {
+        this.tessera = tessera;
     }
 }
-

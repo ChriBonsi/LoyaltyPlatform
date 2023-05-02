@@ -22,10 +22,8 @@ LoyaltyPlatform/.idea
 LoyaltyPlatform/mvnw
 LoyaltyPlatform/mvnw.cmd
 LoyaltyPlatform/HELP.md
-
-#IML file
-LoyaltyPlatform/LoyaltyPlatform.iml
-
+LoyaltyPlatform/target
+LoyaltyPlatform/loyalty-platform.iml
 
 # User-specific stuff
 .idea/**/workspace.xml
