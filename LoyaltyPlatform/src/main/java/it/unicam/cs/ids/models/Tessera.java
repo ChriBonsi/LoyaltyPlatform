@@ -1,18 +1,20 @@
 package it.unicam.cs.ids.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
 public class Tessera {
+
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_tess")
+    @SequenceGenerator(name = "seq_tess", initialValue = 100, allocationSize = 1)
     private Integer id;
+
     private Integer punteggio;
     private Integer livello;
     private Date dataCreazione;
@@ -20,14 +22,34 @@ public class Tessera {
     @OneToOne(mappedBy = "tessera")
     private Cliente cliente;
 
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Offerta> listaCoupon;
+
     public Tessera(Integer id, Integer punteggio, Integer livello, Date dataCreazione) {
         this.id = id;
         this.punteggio = punteggio;
         this.livello = livello;
         this.dataCreazione = dataCreazione;
+        this.listaCoupon = new ArrayList<>();
     }
 
     public Tessera() {
+    }
+
+    public void addCoupon(Offerta offerta) {
+        this.listaCoupon.add(offerta);
+    }
+
+    public void removeCoupon(Offerta offerta) {
+        this.listaCoupon.remove(offerta);
+    }
+
+    public String stampaCoupon() {
+        StringBuilder s = new StringBuilder();
+        for (Offerta offerta : listaCoupon) {
+            s.append(offerta.getNomeOfferta()).append("\n");
+        }
+        return s.toString();
     }
 
     public static Tessera inizializzaNuovaTessera() {
@@ -85,5 +107,13 @@ public class Tessera {
 
     public void setDataCreazione(Date dataCreazione) {
         this.dataCreazione = dataCreazione;
+    }
+
+    public List<Offerta> getListaCoupon() {
+        return listaCoupon;
+    }
+
+    public void setListaCoupon(List<Offerta> listaCoupon) {
+        this.listaCoupon = listaCoupon;
     }
 }

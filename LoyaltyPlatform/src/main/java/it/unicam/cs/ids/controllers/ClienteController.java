@@ -1,28 +1,38 @@
 package it.unicam.cs.ids.controllers;
 
 import it.unicam.cs.ids.models.Cliente;
+import it.unicam.cs.ids.models.Offerta;
 import it.unicam.cs.ids.models.Tessera;
 import it.unicam.cs.ids.repositories.ClienteRepository;
+import it.unicam.cs.ids.repositories.OffertaRepository;
 import it.unicam.cs.ids.repositories.TesseraRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping("/clienti")
 public class ClienteController {
-    private final ClienteRepository repo;
-    private final TesseraRepository tRepo;
+    private final ClienteRepository clienteRepository;
+    private final TesseraRepository tesseraRepository;
+    private final OffertaRepository offertaRepo;
 
-    public ClienteController(ClienteRepository repo, TesseraRepository tRepo) {
-        this.repo = repo;
-        this.tRepo = tRepo;
+    public ClienteController(ClienteRepository clienteRepository, TesseraRepository tesseraRepository, OffertaRepository offertaRepo) {
+        this.clienteRepository = clienteRepository;
+        this.tesseraRepository = tesseraRepository;
+        this.offertaRepo = offertaRepo;
     }
 
     @GetMapping
     public List<Cliente> getCustomers() {
-        return repo.findAll();
+        return clienteRepository.findAll();
+    }
+
+    @GetMapping("{idCliente}")
+    public Cliente getCustomer(@PathVariable("idCliente") Integer id) {
+        return clienteRepository.findById(id).orElse(null);
     }
 
     @PostMapping
@@ -34,31 +44,48 @@ public class ClienteController {
         cliente.setDataNascita(request.dataNascita());
         cliente.setNumeroTelefono(request.numeroTelefono());
 
-        cliente.setTessera(Tessera.inizializzaNuovaTessera());
-        tRepo.save(cliente.getTessera());
+        Tessera tessera = Tessera.inizializzaNuovaTessera();
+        tessera.setListaCoupon(checkOfferte(tessera.getLivello(), offertaRepo));
+        cliente.setTessera(tessera);
+        tesseraRepository.save(tessera);
 
-        repo.save(cliente);
+        clienteRepository.save(cliente);
     }
 
     @DeleteMapping("{idCliente}")
     public void deleteCustomer(@PathVariable("idCliente") Integer id) {
-        repo.deleteById(id);
+        clienteRepository.deleteById(id);
     }
 
     @DeleteMapping
     public void deleteAllCustomers() {
-        repo.deleteAll();
+        clienteRepository.deleteAll();
     }
 
     @PutMapping("{customerID}")
-    public void updateCustomerData(@PathVariable("customerID") Integer id, @RequestBody TemplateCliente updated) {
-        if (repo.findById(id).isPresent()) {
-            Cliente cliente = repo.findById(id).get();
+    public void updateCustomerData(@RequestBody TemplateCliente updated, @PathVariable("customerID") Integer id) {
+        if (clienteRepository.findById(id).isPresent()) {
+            Cliente cliente = clienteRepository.getReferenceById(id);
             cliente.setDataNascita(updated.dataNascita());
             cliente.setEmail(updated.email());
             cliente.setNome(updated.nome());
-            repo.save(cliente);
+            cliente.setCognome(updated.cognome());
+            cliente.setNumeroTelefono(updated.numeroTelefono());
+            clienteRepository.save(cliente);
         }
+    }
+
+    static List<Offerta> checkOfferte(Integer livello, OffertaRepository offertaRepo) {
+        List<Offerta> listaCoupon = new ArrayList<>();
+        for (Offerta o : offertaRepo.findAll()) {
+            System.out.println("Offerta " + o.getId());
+            if (o.getLivello() <= livello) {
+                listaCoupon.add(o);
+                System.out.print("da aggiungere");
+            }
+        }
+        System.out.println(listaCoupon.stream().toString());
+        return listaCoupon;
     }
 
     private record TemplateCliente(String nome, String cognome, String email, Date dataNascita, String numeroTelefono) {
