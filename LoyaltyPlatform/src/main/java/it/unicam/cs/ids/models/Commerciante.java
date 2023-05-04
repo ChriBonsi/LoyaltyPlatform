@@ -21,6 +21,10 @@ public class Commerciante extends UtenteGenerico{
     @Column
     private String indirizzo;
 
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER) // Per le transazioni
+    private Transazione transazione;
+
+
     public Commerciante(String nome, String cognome, String email, String numeroTelefono, Date dataNascita, Integer id, String ragioneSociale, String partitaIVA, String indirizzo) {
         super(nome, cognome, email, numeroTelefono, dataNascita);
         this.id = id;
@@ -36,7 +40,13 @@ public class Commerciante extends UtenteGenerico{
         this.indirizzo = indirizzo;
     }
 
-    public Commerciante() {}
+    public Commerciante() {
+
+    }
+
+    public void addTransazione(Transazione transazione) {      //Da vedere
+        this.tessera.add(transazione);
+    }
 
     @Override
     public String toString() {
@@ -92,5 +102,10 @@ public class Commerciante extends UtenteGenerico{
 
     public void setId(Integer id) {
         this.id = id;
+    }
+    public Transazione getTransazione() {return transazione;}
+
+    public void setTransazione(Transazione transazione) {
+        this.transazione = transazione;
     }
 }

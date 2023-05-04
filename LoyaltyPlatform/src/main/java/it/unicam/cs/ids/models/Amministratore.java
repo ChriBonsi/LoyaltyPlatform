@@ -12,6 +12,9 @@ public class Amministratore extends UtenteGenerico{
     @Column(name = "id", nullable = false)
     private Integer id;
 
+    //@OneToMany PER LE OFFERTE
+
+
     public Amministratore(String nome, String cognome, String email, String numeroTelefono, Date dataNascita, Integer id) {
         super(nome, cognome, email, numeroTelefono, dataNascita);
         this.id = id;
