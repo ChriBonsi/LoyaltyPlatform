@@ -84,7 +84,6 @@ public class OffertaController {
         offertaRepo.deleteAll();
     }
 
-    private record TemplateOfferta(Integer livello, Date dataInizio, Date dataScadenza, String nomeOfferta,
-                                   String descrizioneOfferta) {
+    private record TemplateOfferta(Integer livello, Date dataInizio, Date dataScadenza, String nomeOfferta, String descrizioneOfferta) {
     }
 }

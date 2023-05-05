@@ -1,5 +1,6 @@
 package it.unicam.cs.ids.models;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 
 import java.sql.Date;
@@ -11,19 +12,30 @@ public class Transazione {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_trans")
     @SequenceGenerator(name = "seq_trans", initialValue = 50000, allocationSize = 1)
     private Integer id;
+
     private Integer quantitaPunti;
     private Date dataTransazione;
     private String descrizioneTransazione;
 
-    public Transazione(Integer id, Integer quantitaPunti, Date dataTransazione, String descrizioneTransazione) {
+    @OneToOne
+    private Commerciante commerciante;
+
+    @OneToOne
+    private Tessera tessera;
+
+    @Nullable
+    @OneToOne
+    private Offerta offertaUsata;
+
+    public Transazione(Integer id, Integer quantitaPunti, Date dataTransazione, String descrizioneTransazione, @Nullable Offerta offertaUsata) {
         this.id = id;
         this.quantitaPunti = quantitaPunti;
         this.dataTransazione = dataTransazione;
         this.descrizioneTransazione = descrizioneTransazione;
+        this.offertaUsata = offertaUsata;
     }
     
     public Transazione() {
-        
     }
 
     @Override
@@ -47,14 +59,6 @@ public class Transazione {
         this.id = id;
     }
 
-    public Integer getquantitaPunti() {
-        return quantitaPunti;
-    }
-
-    public void setquantitaPunti(Integer quantitaPunti) {
-        this.quantitaPunti = quantitaPunti;
-    }
-
     public Date getDataTransazione() {
         return dataTransazione;
     }
@@ -70,4 +74,38 @@ public class Transazione {
     public void setDescrizioneTransazione(String descrizioneTransazione) {
         this.descrizioneTransazione = descrizioneTransazione;
     }
+
+    public Commerciante getCommerciante() {
+        return commerciante;
+    }
+
+    public void setCommerciante(Commerciante commerciante) {
+        this.commerciante = commerciante;
+    }
+
+    public Tessera getTessera() {
+        return tessera;
+    }
+
+    public void setTessera(Tessera tessera) {
+        this.tessera = tessera;
+    }
+
+    @Nullable
+    public Offerta getOffertaUsata() {
+        return offertaUsata;
+    }
+
+    public void setOffertaUsata(@Nullable Offerta offertaUsata) {
+        this.offertaUsata = offertaUsata;
+    }
+
+    public Integer getQuantitaPunti() {
+        return quantitaPunti;
+    }
+
+    public void setQuantitaPunti(Integer quantitaPunti) {
+        this.quantitaPunti = quantitaPunti;
+    }
+
 }

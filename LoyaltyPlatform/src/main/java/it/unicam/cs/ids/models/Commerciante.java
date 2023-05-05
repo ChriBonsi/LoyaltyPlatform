@@ -3,27 +3,20 @@ package it.unicam.cs.ids.models;
 import jakarta.persistence.*;
 
 import java.sql.Date;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
-public class Commerciante extends UtenteGenerico{
+public class Commerciante extends UtenteGenerico {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(name = "id", nullable = false)
     private Integer id;
 
-    @Column
     private String ragioneSociale;
 
-    @Column
     private String partitaIVA;
 
-    @Column
     private String indirizzo;
-
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER) // Per le transazioni
-    private Transazione transazione;
-
 
     public Commerciante(String nome, String cognome, String email, String numeroTelefono, Date dataNascita, Integer id, String ragioneSociale, String partitaIVA, String indirizzo) {
         super(nome, cognome, email, numeroTelefono, dataNascita);
@@ -33,29 +26,13 @@ public class Commerciante extends UtenteGenerico{
         this.indirizzo = indirizzo;
     }
 
-    public Commerciante(Integer id, String ragioneSociale, String partitaIVA, String indirizzo) {
-        this.id = id;
-        this.ragioneSociale = ragioneSociale;
-        this.partitaIVA = partitaIVA;
-        this.indirizzo = indirizzo;
-    }
-
     public Commerciante() {
-
-    }
-
-    public void addTransazione(Transazione transazione) {      //Da vedere
-        this.tessera.add(transazione);
+        super();
     }
 
     @Override
     public String toString() {
-        return "Commerciante{" +
-                "id=" + id +
-                ", ragioneSociale='" + ragioneSociale + '\'' +
-                ", partitaIVA='" + partitaIVA + '\'' +
-                ", indirizzo='" + indirizzo + '\'' +
-                "} " + super.toString();
+        return "Commerciante{" + "id=" + id + ", ragioneSociale='" + ragioneSociale + '\'' + ", partitaIVA='" + partitaIVA + '\'' + ", indirizzo='" + indirizzo + '\'' + "} " + super.toString();
     }
 
     @Override
@@ -103,9 +80,5 @@ public class Commerciante extends UtenteGenerico{
     public void setId(Integer id) {
         this.id = id;
     }
-    public Transazione getTransazione() {return transazione;}
 
-    public void setTransazione(Transazione transazione) {
-        this.transazione = transazione;
-    }
 }

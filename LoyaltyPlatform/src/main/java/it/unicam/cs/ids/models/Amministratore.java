@@ -12,15 +12,8 @@ public class Amministratore extends UtenteGenerico{
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    //@OneToMany PER LE OFFERTE
-
-
     public Amministratore(String nome, String cognome, String email, String numeroTelefono, Date dataNascita, Integer id) {
         super(nome, cognome, email, numeroTelefono, dataNascita);
-        this.id = id;
-    }
-
-    public Amministratore(Integer id) {
         this.id = id;
     }
 
@@ -54,54 +47,5 @@ public class Amministratore extends UtenteGenerico{
 
     public void setId(Integer id) {
         this.id = id;
-    }
-    @Override
-    public String getNome() {
-        return super.getNome();
-    }
-
-    @Override
-    public void setNome(String nome) {
-        super.setNome(nome);
-    }
-
-    @Override
-    public String getCognome() {
-        return super.getCognome();
-    }
-
-    @Override
-    public void setCognome(String cognome) {
-        super.setCognome(cognome);
-    }
-
-    @Override
-    public String getEmail() {
-        return super.getEmail();
-    }
-
-    @Override
-    public void setEmail(String email) {
-        super.setEmail(email);
-    }
-
-    @Override
-    public String getNumeroTelefono() {
-        return super.getNumeroTelefono();
-    }
-
-    @Override
-    public void setNumeroTelefono(String numeroTelefono) {
-        super.setNumeroTelefono(numeroTelefono);
-    }
-
-    @Override
-    public Date getDataNascita() {
-        return super.getDataNascita();
-    }
-
-    @Override
-    public void setDataNascita(Date dataNascita) {
-        super.setDataNascita(dataNascita);
     }
 }

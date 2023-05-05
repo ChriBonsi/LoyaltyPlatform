@@ -10,7 +10,7 @@ public class Cliente extends UtenteGenerico {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_cli")
-    @SequenceGenerator(name = "seq_cli", initialValue = 1, allocationSize = 1)
+    @SequenceGenerator(name = "seq_cli", allocationSize = 1)
     private Integer id;
 
     @OneToOne(cascade = CascadeType.ALL)

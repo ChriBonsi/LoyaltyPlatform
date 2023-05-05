@@ -9,7 +9,6 @@ import java.util.Objects;
 public class Analista extends UtenteGenerico{
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(name = "id", nullable = false)
     private Integer id;
 
     public Analista(String nome, String cognome, String email, String numeroTelefono, Date dataNascita, Integer id) {
@@ -17,11 +16,9 @@ public class Analista extends UtenteGenerico{
         this.id = id;
     }
 
-    public Analista(Integer id) {
-        this.id = id;
+    public Analista() {
+        super();
     }
-
-    public Analista() {}
 
     @Override
     public String toString() {
@@ -43,7 +40,6 @@ public class Analista extends UtenteGenerico{
     public int hashCode() {
         return Objects.hash(super.hashCode(), id);
     }
-
 
     public Integer getId() {
         return id;

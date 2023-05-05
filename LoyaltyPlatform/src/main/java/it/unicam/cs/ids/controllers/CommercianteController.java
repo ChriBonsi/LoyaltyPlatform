@@ -1,28 +1,21 @@
 package it.unicam.cs.ids.controllers;
 
 import it.unicam.cs.ids.models.Commerciante;
-import it.unicam.cs.ids.models.Offerta;
-import it.unicam.cs.ids.repositories.ClienteRepository;
+import it.unicam.cs.ids.models.UtenteGenerico;
 import it.unicam.cs.ids.repositories.CommercianteRepository;
-import it.unicam.cs.ids.repositories.OffertaRepository;
-import it.unicam.cs.ids.repositories.TransazioneRepository;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Date;
 import java.util.List;
 
 @RestController
 @RequestMapping("/commercianti")
 public class CommercianteController {
-    private final CommercianteRepository commercianteRepository;
-    private final OffertaRepository offertaRepository;
-    private final TransazioneRepository transazioneRepository;
-    private final ClienteRepository clienteRepository;
 
-    public CommercianteController(CommercianteRepository commercianteRepository, OffertaRepository offertaRepository, TransazioneRepository transazioneRepository, ClienteRepository clienteRepository) {
+    private final CommercianteRepository commercianteRepository;
+
+    public CommercianteController(CommercianteRepository commercianteRepository) {
         this.commercianteRepository = commercianteRepository;
-        this.offertaRepository = offertaRepository;
-        this.transazioneRepository = transazioneRepository;
-        this.clienteRepository = clienteRepository;
     }
 
     @GetMapping
@@ -35,8 +28,34 @@ public class CommercianteController {
         return commercianteRepository.findById(id).orElse(null);
     }
 
-    @PostMapping //DA POSTARE LE TRANSAZIONI + METTERE IL METODO ANCHE DENTRO COMMERCIANTE IMPORTANDOLO DA TRANSAZIONE
+    //TODO DA POSTARE LE TRANSAZIONI + METTERE IL METODO ANCHE DENTRO COMMERCIANTE IMPORTANDOLO DA TRANSAZIONE
+    @PostMapping
+    public void addCommerciante(@RequestBody TemplateCommerciante request) {
+        Commerciante commerciante = new Commerciante();
+        this.setAllFields(commerciante, request);
+        commercianteRepository.save(commerciante);
+    }
 
+    @PutMapping("{commerciante_id}")
+    public void updateCommerciante(@PathVariable("commerciante_id") Integer id, @RequestBody TemplateCommerciante update) {
+        if (commercianteRepository.findById(id).isPresent()) {
+            Commerciante commerciante = commercianteRepository.getReferenceById(id);
+            this.setAllFields(commerciante, update);
+            commercianteRepository.save(commerciante);
+        }
+    }
 
-
+    public void setAllFields(Commerciante toUpdate, TemplateCommerciante toSet){
+        toUpdate.setNome(toSet.nome());
+        toUpdate.setCognome(toSet.cognome());
+        toUpdate.setEmail(toSet.email());
+        toUpdate.setDataNascita(toSet.dataNascita());
+        toUpdate.setNumeroTelefono(toSet.numeroTelefono());
+        toUpdate.setRagioneSociale(toSet.ragioneSociale());
+        toUpdate.setPartitaIVA(toSet.partitaIVA());
+        toUpdate.setIndirizzo(toSet.indirizzo());
+    }
+    
+    private record TemplateCommerciante(String nome, String cognome, String email, Date dataNascita, String numeroTelefono, String ragioneSociale, String partitaIVA, String indirizzo) {
+    }
 }

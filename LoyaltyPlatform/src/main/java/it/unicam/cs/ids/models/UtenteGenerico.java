@@ -2,6 +2,7 @@ package it.unicam.cs.ids.models;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.validation.constraints.Email;
 
 import java.sql.Date;
 import java.util.Objects;
@@ -9,16 +10,17 @@ import java.util.Objects;
 @MappedSuperclass
 public abstract class UtenteGenerico {
 
-    @Column
+    @Column(length = 25)
     private String nome;
 
-    @Column
+    @Column(length = 25)
     private String cognome;
 
-    @Column
+    @Column(unique = true, length = 50)
+    @Email
     private String email;
 
-    @Column
+    @Column(length = 12)
     private String numeroTelefono;
 
     @Column
