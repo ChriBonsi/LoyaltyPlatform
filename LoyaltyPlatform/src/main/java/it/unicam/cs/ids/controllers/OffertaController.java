@@ -66,12 +66,8 @@ public class OffertaController {
         if (offertaRepo.findById(id).isPresent()) {
 
             Offerta offerta = offertaRepo.getReferenceById(id);
-            System.out.println(offerta.getNomeOfferta());
-
             for (Tessera tessera : tesseraRepo.findAll()) {
-                System.out.println(tessera.getId());
                 if (tessera.getListaCoupon().contains(offerta)) {
-                    System.out.println("Rimuovo offerta " + offerta.getNomeOfferta() + " da tessera " + tessera.getId());
                     tessera.removeCoupon(offerta);
                 }
             }
@@ -84,6 +80,7 @@ public class OffertaController {
         offertaRepo.deleteAll();
     }
 
-    private record TemplateOfferta(Integer livello, Date dataInizio, Date dataScadenza, String nomeOfferta, String descrizioneOfferta) {
+    private record TemplateOfferta(Integer livello, Date dataInizio, Date dataScadenza, String nomeOfferta,
+                                   String descrizioneOfferta) {
     }
 }

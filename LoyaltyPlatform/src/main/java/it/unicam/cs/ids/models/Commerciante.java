@@ -8,8 +8,10 @@ import java.util.Objects;
 
 @Entity
 public class Commerciante extends UtenteGenerico {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE) //(strategy = GenerationType.SEQUENCE, generator = "seq_trans")
+    //@SequenceGenerator(name = "seq_trans", initialValue = 50000, allocationSize = 1)
     private Integer id;
 
     private String ragioneSociale;

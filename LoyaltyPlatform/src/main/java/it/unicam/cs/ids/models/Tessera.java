@@ -22,10 +22,10 @@ public class Tessera {
     @OneToOne(mappedBy = "tessera")
     private Cliente cliente;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.ALL)
     private List<Offerta> listaCoupon;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.ALL)
     private List<Transazione> cronologiaTransazioni;
 
     public Tessera(Integer id, Integer punteggio, Integer livello, Date dataCreazione) {
@@ -47,12 +47,20 @@ public class Tessera {
         this.listaCoupon.remove(offerta);
     }
 
+    public void removeAllCoupon() {
+        this.listaCoupon.clear();
+    }
+
     public void addTransazione(Transazione transazione) {
         this.cronologiaTransazioni.add(transazione);
     }
 
     public void removeTransazione(Transazione transazione) {
         this.cronologiaTransazioni.remove(transazione);
+    }
+
+    public void removeAllTransazioni() {
+        this.cronologiaTransazioni.clear();
     }
 
     public String stampaCoupon() {

@@ -1,7 +1,6 @@
 package it.unicam.cs.ids.controllers;
 
 import it.unicam.cs.ids.models.Commerciante;
-import it.unicam.cs.ids.models.UtenteGenerico;
 import it.unicam.cs.ids.repositories.CommercianteRepository;
 import org.springframework.web.bind.annotation.*;
 

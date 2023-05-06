@@ -54,6 +54,9 @@ public class ClienteController {
 
     @DeleteMapping("{idCliente}")
     public void deleteCustomer(@PathVariable("idCliente") Integer id) {
+        Tessera tc = clienteRepository.getReferenceById(id).getTessera();
+        tc.removeAllCoupon();
+        tc.removeAllTransazioni();
         clienteRepository.deleteById(id);
     }
 
