@@ -24,6 +24,7 @@ LoyaltyPlatform/mvnw.cmd
 LoyaltyPlatform/HELP.md
 LoyaltyPlatform/target
 LoyaltyPlatform/loyalty-platform.iml
+LoyaltyPlatform/.DS_Store
 
 # User-specific stuff
 .idea/**/workspace.xml

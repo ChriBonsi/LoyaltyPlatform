@@ -44,7 +44,7 @@ public class CommercianteController {
         }
     }
 
-    public void setAllFields(Commerciante toUpdate, TemplateCommerciante toSet){
+    public void setAllFields(Commerciante toUpdate, TemplateCommerciante toSet) {
         toUpdate.setNome(toSet.nome());
         toUpdate.setCognome(toSet.cognome());
         toUpdate.setEmail(toSet.email());
@@ -54,7 +54,19 @@ public class CommercianteController {
         toUpdate.setPartitaIVA(toSet.partitaIVA());
         toUpdate.setIndirizzo(toSet.indirizzo());
     }
-    
-    private record TemplateCommerciante(String nome, String cognome, String email, Date dataNascita, String numeroTelefono, String ragioneSociale, String partitaIVA, String indirizzo) {
+
+    @DeleteMapping("{idCommerciante}")
+    public void deleteCommerciante(@PathVariable("idCommerciante") Integer id) {
+        commercianteRepository.deleteById(id);
+    }
+
+    @DeleteMapping
+    public void deleteAllCommercianti() {
+        commercianteRepository.deleteAll();
+    }
+
+    private record TemplateCommerciante(String nome, String cognome, String email, Date dataNascita,
+                                        String numeroTelefono, String ragioneSociale, String partitaIVA,
+                                        String indirizzo) {
     }
 }

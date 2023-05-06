@@ -1,5 +1,6 @@
 package it.unicam.cs.ids.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 
@@ -18,10 +19,14 @@ public class Transazione {
     private Date dataTransazione;
     private String descrizioneTransazione;
 
-    @OneToOne
+    @ManyToOne
+    @JoinColumn(name = "commerciante_id")
+    @JsonBackReference
     private Commerciante commerciante;
 
-    @OneToOne
+    @ManyToOne
+    @JoinColumn(name = "tessera_id")
+    @JsonBackReference
     private Tessera tessera;
 
     @Nullable
@@ -35,7 +40,7 @@ public class Transazione {
         this.descrizioneTransazione = descrizioneTransazione;
         this.offertaUsata = offertaUsata;
     }
-    
+
     public Transazione() {
     }
 
@@ -108,5 +113,4 @@ public class Transazione {
     public void setQuantitaPunti(Integer quantitaPunti) {
         this.quantitaPunti = quantitaPunti;
     }
-
 }

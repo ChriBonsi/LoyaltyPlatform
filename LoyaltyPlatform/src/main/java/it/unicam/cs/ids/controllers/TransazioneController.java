@@ -1,8 +1,10 @@
 package it.unicam.cs.ids.controllers;
 
+import it.unicam.cs.ids.models.Offerta;
 import it.unicam.cs.ids.models.Tessera;
 import it.unicam.cs.ids.models.Transazione;
 import it.unicam.cs.ids.repositories.CommercianteRepository;
+import it.unicam.cs.ids.repositories.OffertaRepository;
 import it.unicam.cs.ids.repositories.TesseraRepository;
 import it.unicam.cs.ids.repositories.TransazioneRepository;
 import org.springframework.web.bind.annotation.*;
@@ -15,12 +17,14 @@ import java.util.List;
 public class TransazioneController {
     private final TransazioneRepository transazioneRepository;
     private final TesseraRepository tesseraRepository;
-    private CommercianteRepository commercianteRepository;
+    private final CommercianteRepository commercianteRepository;
+    private final OffertaRepository offertaRepository;
 
-    public TransazioneController(TransazioneRepository transazioneRepository, TesseraRepository tesseraRepository, CommercianteRepository commercianteRepository) {
+    public TransazioneController(TransazioneRepository transazioneRepository, TesseraRepository tesseraRepository, CommercianteRepository commercianteRepository, OffertaRepository offertaRepository) {
         this.transazioneRepository = transazioneRepository;
         this.tesseraRepository = tesseraRepository;
         this.commercianteRepository = commercianteRepository;
+        this.offertaRepository = offertaRepository;
     }
 
     @GetMapping("{idTransazione}")
@@ -40,11 +44,20 @@ public class TransazioneController {
         transazione.setDataTransazione(new Date(System.currentTimeMillis()));
         transazione.setDescrizioneTransazione(request.descrizioneTransazione());
         transazione.setCommerciante(commercianteRepository.getReferenceById(request.idCommerciante()));
-        Tessera nuova = tesseraRepository.getReferenceById(request.idTessera());
-        transazione.setTessera(nuova);
 
-        //TODO aggiunta a lista transazioni
-        //TODO aggiunta punti
+        Tessera tessera = tesseraRepository.getReferenceById(request.idTessera());
+        transazione.setTessera(tessera);
+
+        if (offertaRepository.findById(request.idOfferta()).isPresent()) {
+            Offerta offerta = offertaRepository.getReferenceById(request.idOfferta());
+            transazione.setOffertaUsata(offertaRepository.getReferenceById(request.idOfferta()));
+            if (offerta.consumabile()) {
+                tessera.removeCoupon(offerta);
+            }
+        }
+
+        tessera.addTransazione(transazione);
+        tessera.aggiuntaPunti(transazione.getQuantitaPunti());
 
         transazioneRepository.save(transazione);
     }
@@ -74,8 +87,6 @@ public class TransazioneController {
     public void deleteAllTransazioni() {
         transazioneRepository.deleteAll();
     }
-    
-
 
     record TemplateTransazione(Integer quantitaPunti, Date dataTransazione, String descrizioneTransazione, Integer idTessera, Integer idCommerciante, Integer idOfferta) {
     }

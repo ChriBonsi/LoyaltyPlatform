@@ -1,5 +1,6 @@
 package it.unicam.cs.ids.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.sql.Date;
@@ -25,11 +26,12 @@ public class Tessera {
     @OneToOne(mappedBy = "tessera")
     private Cliente cliente;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Offerta> listaCoupon;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    private List<Transazione> cronologiaTransazioni;
+    @OneToMany(mappedBy = "tessera", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Transazione> cronologiaTransazioni = new ArrayList<>();
 
     public Tessera(Integer id, Integer punteggio, Integer livello, Date dataCreazione) {
         this.id = id;
@@ -80,6 +82,10 @@ public class Tessera {
         tessera.setLivello(0);
         tessera.setDataCreazione(new Date(System.currentTimeMillis()));
         return tessera;
+    }
+
+    public void aggiuntaPunti(Integer quantitaPunti) {
+        this.punteggio += quantitaPunti;
     }
 
     @Override

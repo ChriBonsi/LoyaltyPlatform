@@ -39,6 +39,7 @@ public class OffertaController {
         offerta.setDataScadenza(request.dataScadenza());
         offerta.setNomeOfferta(request.nomeOfferta());
         offerta.setDescrizioneOfferta(request.descrizioneOfferta());
+        offerta.setConsumabile(request.consumabile());//TODO FARE CRONOLOGIA OFFERTE USATE
 
         List<Tessera> toCheck = tesseraRepo.findAll();
         for (Tessera tessera : toCheck) {
@@ -81,6 +82,6 @@ public class OffertaController {
     }
 
     private record TemplateOfferta(Integer livello, Date dataInizio, Date dataScadenza, String nomeOfferta,
-                                   String descrizioneOfferta) {
+                                   String descrizioneOfferta, boolean consumabile) {
     }
 }

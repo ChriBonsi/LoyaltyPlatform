@@ -6,7 +6,7 @@ import java.sql.Date;
 import java.util.Objects;
 
 @Entity
-public class Amministratore extends UtenteGenerico{
+public class Amministratore extends UtenteGenerico {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_amm")
@@ -24,9 +24,7 @@ public class Amministratore extends UtenteGenerico{
 
     @Override
     public String toString() {
-        return "Amministratore{" +
-                "id=" + id +
-                "} " + super.toString();
+        return "Amministratore{" + "id=" + id + "} " + super.toString();
     }
 
     @Override

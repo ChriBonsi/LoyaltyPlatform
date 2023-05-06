@@ -23,13 +23,15 @@ public class Offerta {
     private String nomeOfferta;
 
     private String descrizioneOfferta;
+    private boolean consumabile;
 
-    public Offerta(Integer livello, Date dataInizio, Date dataScadenza, String nomeOfferta, String descrizioneOfferta) {
+    public Offerta(Integer livello, Date dataInizio, Date dataScadenza, String nomeOfferta, String descrizioneOfferta, boolean consumabile) {
         this.livello = livello;
         this.dataInizio = dataInizio;
         this.dataScadenza = dataScadenza;
         this.nomeOfferta = nomeOfferta;
         this.descrizioneOfferta = descrizioneOfferta;
+        this.consumabile = consumabile;
     }
 
     public Offerta() {
@@ -99,5 +101,13 @@ public class Offerta {
 
     public void setDescrizioneOfferta(String descrizioneOfferta) {
         this.descrizioneOfferta = descrizioneOfferta;
+    }
+
+    public boolean consumabile() {
+        return this.consumabile;
+    }
+
+    public void setConsumabile(boolean consumabile) {
+        this.consumabile = consumabile;
     }
 }
