@@ -10,8 +10,10 @@ public class Offerta {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_off")
-    @SequenceGenerator(name = "seq_off", initialValue = 10000, allocationSize = 1)
+    @SequenceGenerator(name = "seq_off", initialValue = 1001, allocationSize = 1)
     private Integer id;
+
+    @Column(length = 3)
     private Integer livello;
 
     //yyyy-[m]m-[d]d

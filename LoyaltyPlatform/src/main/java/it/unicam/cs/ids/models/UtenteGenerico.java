@@ -20,7 +20,7 @@ public abstract class UtenteGenerico {
     @Email
     private String email;
 
-    @Column(length = 12)
+    @Column(length = 15)
     private String numeroTelefono;
 
     @Column

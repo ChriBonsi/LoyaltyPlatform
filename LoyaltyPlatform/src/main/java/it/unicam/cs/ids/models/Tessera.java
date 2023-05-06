@@ -12,10 +12,13 @@ public class Tessera {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_tess")
-    @SequenceGenerator(name = "seq_tess", initialValue = 100, allocationSize = 1)
+    @SequenceGenerator(name = "seq_tess", initialValue = 501, allocationSize = 1)
     private Integer id;
 
+    @Column(length = 5)
     private Integer punteggio;
+
+    @Column(length = 3)
     private Integer livello;
     private Date dataCreazione;
 

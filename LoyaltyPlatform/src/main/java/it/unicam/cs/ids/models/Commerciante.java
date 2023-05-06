@@ -10,14 +10,16 @@ import java.util.Objects;
 public class Commerciante extends UtenteGenerico {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE) //(strategy = GenerationType.SEQUENCE, generator = "seq_trans")
-    //@SequenceGenerator(name = "seq_trans", initialValue = 50000, allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_comm")
+    @SequenceGenerator(name = "seq_comm", initialValue = 201, allocationSize = 1)
     private Integer id;
 
+    @Column(length = 50)
     private String ragioneSociale;
-
+    @Column(length = 11)
     private String partitaIVA;
 
+    @Column(length = 50)
     private String indirizzo;
 
     public Commerciante(String nome, String cognome, String email, String numeroTelefono, Date dataNascita, Integer id, String ragioneSociale, String partitaIVA, String indirizzo) {
