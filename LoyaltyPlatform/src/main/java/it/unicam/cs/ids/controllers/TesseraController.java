@@ -42,7 +42,6 @@ public class TesseraController {
 
         tessera.setListaCoupon(checkOfferte(tessera.getLivello(), offertaRepo));
 
-
         tesseraRepo.save(tessera);
     }
 

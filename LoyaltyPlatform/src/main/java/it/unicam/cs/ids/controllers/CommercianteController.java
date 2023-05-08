@@ -27,7 +27,6 @@ public class CommercianteController {
         return commercianteRepository.findById(id).orElse(null);
     }
 
-    //TODO DA POSTARE LE TRANSAZIONI + METTERE IL METODO ANCHE DENTRO COMMERCIANTE IMPORTANDOLO DA TRANSAZIONE
     @PostMapping
     public void addCommerciante(@RequestBody TemplateCommerciante request) {
         Commerciante commerciante = new Commerciante();

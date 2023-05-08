@@ -88,6 +88,7 @@ public class TransazioneController {
         transazioneRepository.deleteAll();
     }
 
-    record TemplateTransazione(Integer quantitaPunti, Date dataTransazione, String descrizioneTransazione, Integer idTessera, Integer idCommerciante, Integer idOfferta) {
+    record TemplateTransazione(Integer quantitaPunti, Date dataTransazione, String descrizioneTransazione,
+                               Integer idTessera, Integer idCommerciante, Integer idOfferta) {
     }
 }
