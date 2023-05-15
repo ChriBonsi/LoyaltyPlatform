@@ -14,8 +14,10 @@ public class Transazione {
     @SequenceGenerator(name = "seq_trans", initialValue = 10001, allocationSize = 1)
     private Integer id;
 
-    @Column(length = 5)
-    private Integer quantitaPunti;
+    private final static double PUNTI_PER_EURO = 0.5;
+
+    @Column(length = 7)
+    private Double importoTransazione;
     private Date dataTransazione;
     private String descrizioneTransazione;
 
@@ -33,9 +35,9 @@ public class Transazione {
     @OneToOne
     private Offerta offertaUsata;
 
-    public Transazione(Integer id, Integer quantitaPunti, Date dataTransazione, String descrizioneTransazione, @Nullable Offerta offertaUsata) {
+    public Transazione(Integer id, Double importoTransazione, Date dataTransazione, String descrizioneTransazione, @Nullable Offerta offertaUsata) {
         this.id = id;
-        this.quantitaPunti = quantitaPunti;
+        this.importoTransazione = importoTransazione;
         this.dataTransazione = dataTransazione;
         this.descrizioneTransazione = descrizioneTransazione;
         this.offertaUsata = offertaUsata;
@@ -49,12 +51,12 @@ public class Transazione {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Transazione that = (Transazione) o;
-        return Objects.equals(id, that.id) && Objects.equals(quantitaPunti, that.quantitaPunti) && Objects.equals(dataTransazione, that.dataTransazione) && Objects.equals(descrizioneTransazione, that.descrizioneTransazione);
+        return Objects.equals(id, that.id) && Objects.equals(importoTransazione, that.importoTransazione) && Objects.equals(dataTransazione, that.dataTransazione) && Objects.equals(descrizioneTransazione, that.descrizioneTransazione);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, quantitaPunti, dataTransazione, descrizioneTransazione);
+        return Objects.hash(id, importoTransazione, dataTransazione, descrizioneTransazione);
     }
 
     public Integer getId() {
@@ -106,11 +108,48 @@ public class Transazione {
         this.offertaUsata = offertaUsata;
     }
 
-    public Integer getQuantitaPunti() {
-        return quantitaPunti;
+    public Double getImportoTransazione() {
+        return importoTransazione;
     }
 
-    public void setQuantitaPunti(Integer quantitaPunti) {
-        this.quantitaPunti = quantitaPunti;
+    public void setImportoTransazione(Double importoTransazione) {
+        this.importoTransazione = importoTransazione;
+    }
+
+    public Integer convertiInPunti() {
+        return (int) (importoTransazione * PUNTI_PER_EURO);
+    }
+
+    @SuppressWarnings({"ConstantConditions"})
+    public Integer ricalcolaPunteggio(Offerta offerta) {
+        if (offerta == null) {
+            return nettoPositivo(offerta);
+        } else {
+            return nettoPositivo(offerta) - offerta.getPuntiNecessari();
+        }
+    }
+
+    public Integer nettoPositivo(Offerta offerta) {
+        if (offerta == null) {
+            return this.convertiInPunti();
+        } else {
+            return offerta.getPuntiBonus() + (int) (this.convertiInPunti()*offerta.getMoltiplicatore());
+        }
+    }
+
+    public Integer getIdCommerciante() {
+        return commerciante.getId();
+    }
+
+    public Integer getIdTessera() {
+        return tessera.getId();
+    }
+
+    public Integer getIdOffertaUsata() {
+        if (offertaUsata == null) {
+            return null;
+        } else {
+            return offertaUsata.getId();
+        }
     }
 }

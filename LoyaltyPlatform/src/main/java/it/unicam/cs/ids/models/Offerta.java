@@ -25,13 +25,21 @@ public class Offerta {
     private String descrizioneOfferta;
     private boolean consumabile;
 
-    public Offerta(Integer livello, Date dataInizio, Date dataScadenza, String nomeOfferta, String descrizioneOfferta, boolean consumabile) {
+    private Integer puntiNecessari;
+
+    private Integer puntiBonus;
+
+    private Double moltiplicatore;
+
+    public Offerta(Integer livello, Date dataInizio, Date dataScadenza, String nomeOfferta, String descrizioneOfferta, boolean consumabile, Integer costoPunti, Integer puntiBonus) {
         this.livello = livello;
         this.dataInizio = dataInizio;
         this.dataScadenza = dataScadenza;
         this.nomeOfferta = nomeOfferta;
         this.descrizioneOfferta = descrizioneOfferta;
         this.consumabile = consumabile;
+        this.puntiNecessari = costoPunti;
+        this.puntiBonus = puntiBonus;
     }
 
     public Offerta() {
@@ -47,12 +55,12 @@ public class Offerta {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Offerta offerta = (Offerta) o;
-        return Objects.equals(id, offerta.id) && Objects.equals(livello, offerta.livello) && Objects.equals(dataInizio, offerta.dataInizio) && Objects.equals(dataScadenza, offerta.dataScadenza) && Objects.equals(nomeOfferta, offerta.nomeOfferta) && Objects.equals(descrizioneOfferta, offerta.descrizioneOfferta);
+        return consumabile == offerta.consumabile && Objects.equals(id, offerta.id) && Objects.equals(livello, offerta.livello) && Objects.equals(dataInizio, offerta.dataInizio) && Objects.equals(dataScadenza, offerta.dataScadenza) && Objects.equals(nomeOfferta, offerta.nomeOfferta) && Objects.equals(descrizioneOfferta, offerta.descrizioneOfferta) && Objects.equals(puntiNecessari, offerta.puntiNecessari) && Objects.equals(puntiBonus, offerta.puntiBonus) && Objects.equals(moltiplicatore, offerta.moltiplicatore);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, livello, dataInizio, dataScadenza, nomeOfferta, descrizioneOfferta);
+        return Objects.hash(id, livello, dataInizio, dataScadenza, nomeOfferta, descrizioneOfferta, consumabile, puntiNecessari, puntiBonus, moltiplicatore);
     }
 
     public Integer getId() {
@@ -109,5 +117,29 @@ public class Offerta {
 
     public void setConsumabile(boolean consumabile) {
         this.consumabile = consumabile;
+    }
+
+    public Integer getPuntiNecessari() {
+        return puntiNecessari;
+    }
+
+    public void setPuntiNecessari(Integer puntiNecessari) {
+        this.puntiNecessari = puntiNecessari;
+    }
+
+    public Integer getPuntiBonus() {
+        return puntiBonus;
+    }
+
+    public void setPuntiBonus(Integer puntiBonus) {
+        this.puntiBonus = puntiBonus;
+    }
+
+    public Double getMoltiplicatore() {
+        return moltiplicatore;
+    }
+
+    public void setMoltiplicatore(Double moltiplicatore) {
+        this.moltiplicatore = moltiplicatore;
     }
 }

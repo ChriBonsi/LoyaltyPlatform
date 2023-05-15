@@ -8,9 +8,11 @@ import it.unicam.cs.ids.repositories.OffertaRepository;
 import it.unicam.cs.ids.repositories.TesseraRepository;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+
+import static it.unicam.cs.ids.models.UtenteGenerico.setNonNullFields;
+import static it.unicam.cs.ids.models.UtenteGenerico.setUtenteFields;
 
 @RestController
 @RequestMapping("/clienti")
@@ -36,13 +38,9 @@ public class ClienteController {
     }
 
     @PostMapping
-    public void addCustomer(@RequestBody TemplateCliente request) {
+    public void addCustomer(@RequestBody Cliente request) {
         Cliente cliente = new Cliente();
-        cliente.setNome(request.nome());
-        cliente.setCognome(request.cognome());
-        cliente.setEmail(request.email());
-        cliente.setDataNascita(request.dataNascita());
-        cliente.setNumeroTelefono(request.numeroTelefono());
+        setUtenteFields(cliente, request);
 
         Tessera tessera = Tessera.inizializzaNuovaTessera();
         tessera.setListaCoupon(checkOfferte(tessera.getLivello(), offertaRepo));
@@ -66,15 +64,19 @@ public class ClienteController {
     }
 
     @PutMapping("{customerID}")
-    public void updateCustomerData(@RequestBody TemplateCliente updated, @PathVariable("customerID") Integer id) {
+    public void updateCustomerData(@RequestBody Cliente updated, @PathVariable("customerID") Integer id) {
         if (clienteRepository.findById(id).isPresent()) {
             Cliente cliente = clienteRepository.getReferenceById(id);
-            cliente.setDataNascita(updated.dataNascita());
-            cliente.setEmail(updated.email());
-            cliente.setNome(updated.nome());
-            cliente.setCognome(updated.cognome());
-            cliente.setNumeroTelefono(updated.numeroTelefono());
+            setUtenteFields(cliente, updated);
             clienteRepository.save(cliente);
+        }
+    }
+
+    @PatchMapping("{idCliente}")
+    public void patchCliente(@PathVariable("idCliente") Integer id, @RequestBody Cliente update) {
+        if (clienteRepository.findById(id).isPresent()) {
+            Cliente cliente = clienteRepository.getReferenceById(id);
+            setNonNullFields(cliente, update);
         }
     }
 
@@ -89,8 +91,5 @@ public class ClienteController {
         }
         System.out.println(listaCoupon.stream().toString());
         return listaCoupon;
-    }
-
-    private record TemplateCliente(String nome, String cognome, String email, Date dataNascita, String numeroTelefono) {
     }
 }

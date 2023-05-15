@@ -26,6 +26,10 @@ public abstract class UtenteGenerico {
     @Column
     private Date dataNascita;
 
+    //Da qui sto aggiungendo roba del login
+
+    //finisce la roba del login
+
     protected UtenteGenerico(String nome, String cognome, String email, String numeroTelefono, Date dataNascita) {
         this.nome = nome;
         this.cognome = cognome;
@@ -37,6 +41,32 @@ public abstract class UtenteGenerico {
     protected UtenteGenerico() {
     }
 
+    public static <T extends UtenteGenerico> void setUtenteFields(T toUpdate, T sorgente) {
+        toUpdate.setNome(sorgente.getNome());
+        toUpdate.setCognome(sorgente.getCognome());
+        toUpdate.setEmail(sorgente.getEmail());
+        toUpdate.setNumeroTelefono(sorgente.getNumeroTelefono());
+        toUpdate.setDataNascita(sorgente.getDataNascita());
+    }
+
+    public static <T extends UtenteGenerico> void setNonNullFields(T toUpdate, T sorgente) {
+        if (toUpdate.getNome() != null) {
+            sorgente.setNome(toUpdate.getNome());
+        }
+        if (toUpdate.getCognome() != null) {
+            sorgente.setCognome(toUpdate.getCognome());
+        }
+        if (toUpdate.getDataNascita() != null) {
+            sorgente.setDataNascita(toUpdate.getDataNascita());
+        }
+        if (toUpdate.getNumeroTelefono() != null) {
+            sorgente.setNumeroTelefono(toUpdate.getNumeroTelefono());
+        }
+        if (toUpdate.getEmail() != null) {
+            sorgente.setEmail(toUpdate.getEmail());
+        }
+    }
+    
     @Override
     public String toString() {
         return "UtenteGenerico{" + "nome='" + nome + '\'' + ", cognome='" + cognome + '\'' + ", email='" + email + '\'' + ", numeroTelefono='" + numeroTelefono + '\'' + ", dataNascita=" + dataNascita + '}';

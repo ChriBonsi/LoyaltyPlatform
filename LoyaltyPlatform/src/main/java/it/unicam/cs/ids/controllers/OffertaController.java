@@ -6,82 +6,112 @@ import it.unicam.cs.ids.repositories.OffertaRepository;
 import it.unicam.cs.ids.repositories.TesseraRepository;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Date;
 import java.util.List;
 
 @RestController
 @RequestMapping("/offerte")
 public class OffertaController {
 
-    private final OffertaRepository offertaRepo;
-    private final TesseraRepository tesseraRepo;
+    private final OffertaRepository offertaRepository;
+    private final TesseraRepository tesseraRepository;
 
-    public OffertaController(OffertaRepository offertaRepo, TesseraRepository tesseraRepo) {
-        this.offertaRepo = offertaRepo;
-        this.tesseraRepo = tesseraRepo;
+    public OffertaController(OffertaRepository offertaRepository, TesseraRepository tesseraRepository) {
+        this.offertaRepository = offertaRepository;
+        this.tesseraRepository = tesseraRepository;
     }
 
     @GetMapping
     public List<Offerta> getOfferte() {
-        return offertaRepo.findAll();
+        return offertaRepository.findAll();
     }
 
     @GetMapping("{idOfferta}")
     public Offerta getOfferta(@PathVariable("idOfferta") Integer id) {
-        return offertaRepo.findById(id).orElse(null);
+        return offertaRepository.findById(id).orElse(null);
     }
 
     @PostMapping
-    public void addOfferta(@RequestBody TemplateOfferta request) {
+    public void addOfferta(@RequestBody Offerta request) {
         Offerta offerta = new Offerta();
-        offerta.setLivello(request.livello());
-        offerta.setDataInizio(request.dataInizio());
-        offerta.setDataScadenza(request.dataScadenza());
-        offerta.setNomeOfferta(request.nomeOfferta());
-        offerta.setDescrizioneOfferta(request.descrizioneOfferta());
-        offerta.setConsumabile(request.consumabile());//TODO FARE CRONOLOGIA OFFERTE USATE
+        this.setAllFields(offerta, request);
 
-        List<Tessera> toCheck = tesseraRepo.findAll();
+        List<Tessera> toCheck = tesseraRepository.findAll();
         for (Tessera tessera : toCheck) {
             if (tessera.getLivello() >= offerta.getLivello()) {
                 tessera.addCoupon(offerta);
             }
         }
-        offertaRepo.save(offerta);
+        offertaRepository.save(offerta);
     }
 
     @PutMapping("{offertaID}")
-    public void updateOfferta(@PathVariable("offertaID") Integer id, @RequestBody TemplateOfferta updated) {
-        if (offertaRepo.findById(id).isPresent()) {
-            Offerta offerta = offertaRepo.getReferenceById(id);
-            offerta.setLivello(updated.livello());
-            offerta.setDataInizio(updated.dataInizio());
-            offerta.setDataScadenza(updated.dataScadenza());
-            offerta.setDescrizioneOfferta(updated.descrizioneOfferta());
-            offertaRepo.save(offerta);
+    public void updateOfferta(@PathVariable("offertaID") Integer id, @RequestBody Offerta updated) {
+        if (offertaRepository.findById(id).isPresent()) {
+            Offerta offerta = offertaRepository.getReferenceById(id);
+            this.setAllFields(offerta, updated);
+            offertaRepository.save(offerta);
         }
     }
 
     @DeleteMapping("{idOfferta}")
     public void deleteOfferta(@PathVariable("idOfferta") Integer id) {
-        if (offertaRepo.findById(id).isPresent()) {
+        if (offertaRepository.findById(id).isPresent()) {
 
-            Offerta offerta = offertaRepo.getReferenceById(id);
-            for (Tessera tessera : tesseraRepo.findAll()) {
+            Offerta offerta = offertaRepository.getReferenceById(id);
+            for (Tessera tessera : tesseraRepository.findAll()) {
                 if (tessera.getListaCoupon().contains(offerta)) {
                     tessera.removeCoupon(offerta);
                 }
             }
-            offertaRepo.deleteById(id);
+            offertaRepository.deleteById(id);
+        }
+    }
+
+    @PatchMapping("{idOfferta}")
+    public void patchOfferta(@PathVariable("idOfferta") Integer id, @RequestBody Offerta update) {
+        if (offertaRepository.findById(id).isPresent()) {
+            Offerta offerta = offertaRepository.getReferenceById(id);
+            if (update.getLivello() != null) {
+                offerta.setLivello(update.getLivello());
+            }
+            if (update.getDataInizio() != null) {
+                offerta.setDataInizio(update.getDataInizio());
+            }
+            if (update.getDataScadenza() != null) {
+                offerta.setDataScadenza(update.getDataScadenza());
+            }
+            if (update.getNomeOfferta() != null) {
+                offerta.setNomeOfferta(update.getNomeOfferta());
+            }
+            if (update.getDescrizioneOfferta() != null) {
+                offerta.setDescrizioneOfferta(update.getDescrizioneOfferta());
+            }
+            if (update.getPuntiNecessari() != null) {
+                offerta.setPuntiNecessari(update.getPuntiNecessari());
+            }
+            if (update.getPuntiBonus() != null) {
+                offerta.setPuntiBonus(update.getPuntiBonus());
+            }
+            if (update.getMoltiplicatore() != null) {
+                offerta.setMoltiplicatore(update.getMoltiplicatore());
+            }
         }
     }
 
     @DeleteMapping
     public void deleteAllOfferte() {
-        offertaRepo.deleteAll();
+        offertaRepository.deleteAll();
     }
 
-    private record TemplateOfferta(Integer livello, Date dataInizio, Date dataScadenza, String nomeOfferta,
-                                   String descrizioneOfferta, boolean consumabile) {
+    private void setAllFields(Offerta offerta, Offerta updated) {
+        offerta.setLivello(updated.getLivello());
+        offerta.setDataInizio(updated.getDataInizio());
+        offerta.setDataScadenza(updated.getDataScadenza());
+        offerta.setDescrizioneOfferta(updated.getDescrizioneOfferta());
+        offerta.setNomeOfferta(updated.getNomeOfferta());
+        offerta.setPuntiNecessari(updated.getPuntiNecessari());
+        offerta.setPuntiBonus(updated.getPuntiBonus());
+        offerta.setMoltiplicatore(updated.getMoltiplicatore());
+        offerta.setConsumabile(updated.consumabile());
     }
 }

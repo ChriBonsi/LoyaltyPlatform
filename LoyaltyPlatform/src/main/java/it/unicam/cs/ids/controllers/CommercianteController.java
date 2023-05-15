@@ -4,8 +4,10 @@ import it.unicam.cs.ids.models.Commerciante;
 import it.unicam.cs.ids.repositories.CommercianteRepository;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Date;
 import java.util.List;
+
+import static it.unicam.cs.ids.models.UtenteGenerico.setNonNullFields;
+import static it.unicam.cs.ids.models.UtenteGenerico.setUtenteFields;
 
 @RestController
 @RequestMapping("/commercianti")
@@ -28,30 +30,19 @@ public class CommercianteController {
     }
 
     @PostMapping
-    public void addCommerciante(@RequestBody TemplateCommerciante request) {
+    public void addCommerciante(@RequestBody Commerciante request) {
         Commerciante commerciante = new Commerciante();
         this.setAllFields(commerciante, request);
         commercianteRepository.save(commerciante);
     }
 
     @PutMapping("{commerciante_id}")
-    public void updateCommerciante(@PathVariable("commerciante_id") Integer id, @RequestBody TemplateCommerciante update) {
+    public void updateCommerciante(@PathVariable("commerciante_id") Integer id, @RequestBody Commerciante update) {
         if (commercianteRepository.findById(id).isPresent()) {
             Commerciante commerciante = commercianteRepository.getReferenceById(id);
             this.setAllFields(commerciante, update);
             commercianteRepository.save(commerciante);
         }
-    }
-
-    public void setAllFields(Commerciante toUpdate, TemplateCommerciante toSet) {
-        toUpdate.setNome(toSet.nome());
-        toUpdate.setCognome(toSet.cognome());
-        toUpdate.setEmail(toSet.email());
-        toUpdate.setDataNascita(toSet.dataNascita());
-        toUpdate.setNumeroTelefono(toSet.numeroTelefono());
-        toUpdate.setRagioneSociale(toSet.ragioneSociale());
-        toUpdate.setPartitaIVA(toSet.partitaIVA());
-        toUpdate.setIndirizzo(toSet.indirizzo());
     }
 
     @DeleteMapping("{idCommerciante}")
@@ -64,8 +55,27 @@ public class CommercianteController {
         commercianteRepository.deleteAll();
     }
 
-    private record TemplateCommerciante(String nome, String cognome, String email, Date dataNascita,
-                                        String numeroTelefono, String ragioneSociale, String partitaIVA,
-                                        String indirizzo) {
+    @PatchMapping("{idCommerciante}")
+    public void patchCommerciante(@PathVariable("idCommerciante") Integer id, @RequestBody Commerciante update) {
+        if (commercianteRepository.findById(id).isPresent()) {
+            Commerciante commerciante = commercianteRepository.getReferenceById(id);
+            setNonNullFields(commerciante, update);
+            if (update.getRagioneSociale() != null) {
+                commerciante.setRagioneSociale(update.getRagioneSociale());
+            }
+            if (update.getPartitaIVA() != null) {
+                commerciante.setPartitaIVA(update.getPartitaIVA());
+            }
+            if (update.getIndirizzo() != null) {
+                commerciante.setIndirizzo(update.getIndirizzo());
+            }
+        }
+    }
+
+    public void setAllFields(Commerciante toUpdate, Commerciante toSet) {
+        setUtenteFields(toUpdate, toSet);
+        toUpdate.setRagioneSociale(toSet.getRagioneSociale());
+        toUpdate.setPartitaIVA(toSet.getPartitaIVA());
+        toUpdate.setIndirizzo(toSet.getIndirizzo());
     }
 }

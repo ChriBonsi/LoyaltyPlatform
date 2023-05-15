@@ -2,13 +2,12 @@ package it.unicam.cs.ids.controllers;
 
 import it.unicam.cs.ids.models.Amministratore;
 import it.unicam.cs.ids.repositories.AmministratoreRepository;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Date;
 import java.util.List;
+
+import static it.unicam.cs.ids.models.UtenteGenerico.setNonNullFields;
+import static it.unicam.cs.ids.models.UtenteGenerico.setUtenteFields;
 
 @RestController
 @RequestMapping("/amministratori")
@@ -21,7 +20,7 @@ public class AmministratoreController {
     }
 
     @GetMapping
-    public List<Amministratore> getAmministratore() {
+    public List<Amministratore> getAmministratori() {
         return amministratoreRepository.findAll();
     }
 
@@ -31,9 +30,9 @@ public class AmministratoreController {
     }
 
     @PostMapping
-    public void addAmministratore(@RequestBody TemplateAdmin temp) {
+    public void addAmministratore(@RequestBody Amministratore temp) {
         Amministratore amministratore = new Amministratore();
-        setFields(amministratore, temp);
+        setUtenteFields(amministratore, temp);
         amministratoreRepository.save(amministratore);
     }
 
@@ -48,22 +47,19 @@ public class AmministratoreController {
     }
 
     @PutMapping("{idAmministratore}")
-    public void updateAdmin(@PathVariable("idAmministratore") Integer id, @RequestBody TemplateAdmin temp) {
+    public void updateAdmin(@PathVariable("idAmministratore") Integer id, @RequestBody Amministratore temp) {
         if (amministratoreRepository.findById(id).isPresent()) {
             Amministratore amministratore = amministratoreRepository.getReferenceById(id);
-            setFields(amministratore, temp);
+            setUtenteFields(amministratore, temp);
             amministratoreRepository.save(amministratore);
         }
     }
 
-    private void setFields(Amministratore amministratore, TemplateAdmin temp) {
-        amministratore.setNome(temp.nome());
-        amministratore.setCognome(temp.cognome());
-        amministratore.setEmail(temp.email());
-        amministratore.setDataNascita(temp.dataNascita());
-        amministratore.setNumeroTelefono(temp.numeroTelefono());
-    }
-
-    private record TemplateAdmin(String nome, String cognome, String email, Date dataNascita, String numeroTelefono) {
+    @PatchMapping("{idAmministratore}")
+    public void patchAmministratore(@PathVariable("idAmministratore") Integer id, @RequestBody Amministratore update) {
+        if (amministratoreRepository.findById(id).isPresent()) {
+            Amministratore amministratore = amministratoreRepository.getReferenceById(id);
+            setNonNullFields(amministratore, update);
+        }
     }
 }

@@ -17,7 +17,10 @@ public class Tessera {
     private Integer id;
 
     @Column(length = 5)
-    private Integer punteggio;
+    private Integer punteggioDisponibile;
+
+    @Column(length = 5)
+    private Integer punteggioTotale;
 
     @Column(length = 3)
     private Integer livello;
@@ -28,16 +31,19 @@ public class Tessera {
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<Offerta> listaCoupon;
+    //TODO lista cronologia delle offerte
 
     @OneToMany(mappedBy = "tessera", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Transazione> cronologiaTransazioni = new ArrayList<>();
 
-    public Tessera(Integer id, Integer punteggio, Integer livello, Date dataCreazione) {
+    public Tessera(Integer id, Integer punteggioDisponibile, Integer punteggioTotale, Integer livello, Date dataCreazione, Cliente cliente) {
         this.id = id;
-        this.punteggio = punteggio;
+        this.punteggioDisponibile = punteggioDisponibile;
+        this.punteggioTotale = punteggioTotale;
         this.livello = livello;
         this.dataCreazione = dataCreazione;
+        this.cliente = cliente;
         this.listaCoupon = new ArrayList<>();
     }
 
@@ -78,14 +84,15 @@ public class Tessera {
 
     public static Tessera inizializzaNuovaTessera() {
         Tessera tessera = new Tessera();
-        tessera.setPunteggio(0);
+        tessera.setPunteggioDisponibile(0);
         tessera.setLivello(0);
         tessera.setDataCreazione(new Date(System.currentTimeMillis()));
         return tessera;
     }
 
-    public void aggiuntaPunti(Integer quantitaPunti) {
-        this.punteggio += quantitaPunti;
+    public void aggiuntaPunti(Integer offsetPunteggio, Integer offsetPositivo) {
+        this.punteggioDisponibile += offsetPunteggio;
+        this.punteggioTotale += offsetPositivo;
     }
 
     @Override
@@ -93,16 +100,16 @@ public class Tessera {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Tessera tessera = (Tessera) o;
-        return Objects.equals(id, tessera.id) && Objects.equals(livello, tessera.livello) && Objects.equals(punteggio, tessera.punteggio) && Objects.equals(dataCreazione, tessera.dataCreazione);
+        return Objects.equals(id, tessera.id) && Objects.equals(livello, tessera.livello) && Objects.equals(punteggioDisponibile, tessera.punteggioDisponibile) && Objects.equals(dataCreazione, tessera.dataCreazione);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, punteggio, livello, dataCreazione);
+        return Objects.hash(id, punteggioDisponibile, livello, dataCreazione);
     }
 
     public String toString() {
-        return "Tessera{" + "idTessera=" + id + ", punteggio='" + punteggio + '\'' + ", livello='" + livello + '\'' + ", dataCreazione='" + dataCreazione + '\'' + '}';
+        return "Tessera{" + "idTessera=" + id + ", punteggio='" + punteggioDisponibile + '\'' + ", livello='" + livello + '\'' + ", dataCreazione='" + dataCreazione + '\'' + '}';
     }
 
     public Integer getId() {
@@ -113,15 +120,11 @@ public class Tessera {
         this.id = idTessera;
     }
 
-    public int getPunteggio() {
-        return punteggio;
+    public Integer getPunteggioDisponibile() {
+        return punteggioDisponibile;
     }
 
-    public void setPunteggio(int punteggio) {
-        this.punteggio = punteggio;
-    }
-
-    public int getLivello() {
+    public Integer getLivello() {
         return livello;
     }
 
@@ -151,5 +154,17 @@ public class Tessera {
 
     public void setCronologiaTransazioni(List<Transazione> cronologiaTransazioni) {
         this.cronologiaTransazioni = cronologiaTransazioni;
+    }
+
+    public void setPunteggioDisponibile(Integer punteggioDisponibile) {
+        this.punteggioDisponibile = punteggioDisponibile;
+    }
+
+    public Integer getPunteggioTotale() {
+        return punteggioTotale;
+    }
+
+    public void setPunteggioTotale(Integer punteggioTotale) {
+        this.punteggioTotale = punteggioTotale;
     }
 }

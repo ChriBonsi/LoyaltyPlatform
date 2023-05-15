@@ -8,6 +8,7 @@ import java.util.Objects;
 @Entity
 public class Cliente extends UtenteGenerico {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_cli")
     @SequenceGenerator(name = "seq_cli", allocationSize = 1)

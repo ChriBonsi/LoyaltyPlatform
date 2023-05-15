@@ -38,36 +38,43 @@ public class TransazioneController {
     }
 
     @PostMapping
-    public void addTransazione(@RequestBody TemplateTransazione request) {
+    public void addTransazione(@RequestBody Transazione request) {
         Transazione transazione = new Transazione();
-        transazione.setQuantitaPunti(request.quantitaPunti()); //TODO CONVERTIRE SOLDI SPESI IN PUNTI DA FAR AGGIUNGERE PER QUANTITAPUNTI
+        transazione.setImportoTransazione(request.getImportoTransazione());
         transazione.setDataTransazione(new Date(System.currentTimeMillis()));
-        transazione.setDescrizioneTransazione(request.descrizioneTransazione());
-        transazione.setCommerciante(commercianteRepository.getReferenceById(request.idCommerciante()));
+        transazione.setDescrizioneTransazione(request.getDescrizioneTransazione());
+        transazione.setCommerciante(commercianteRepository.getReferenceById(request.getIdCommerciante()));
 
-        Tessera tessera = tesseraRepository.getReferenceById(request.idTessera());
+        Tessera tessera = tesseraRepository.getReferenceById(request.getIdTessera());
         transazione.setTessera(tessera);
 
-        if (offertaRepository.findById(request.idOfferta()).isPresent()) {
-            Offerta offerta = offertaRepository.getReferenceById(request.idOfferta());
-            transazione.setOffertaUsata(offertaRepository.getReferenceById(request.idOfferta()));
-            if (offerta.consumabile()) {
-                tessera.removeCoupon(offerta);
+        Offerta offerta = null;
+
+        if (offertaRepository.findById(request.getIdOffertaUsata()).isPresent()) {
+            offerta = offertaRepository.getReferenceById(request.getIdOffertaUsata());
+            if (offerta.getPuntiNecessari() <= tessera.getPunteggioDisponibile()) {
+                transazione.setOffertaUsata(offertaRepository.getReferenceById(request.getIdOffertaUsata()));
+                if (offerta.consumabile()) {
+                    tessera.removeCoupon(offerta);
+                }
+            } else {
+                offerta = null;
+                System.out.println("Punti insufficienti");
             }
         }
 
         tessera.addTransazione(transazione);
-        tessera.aggiuntaPunti(transazione.getQuantitaPunti());
+        tessera.aggiuntaPunti(transazione.ricalcolaPunteggio(offerta), transazione.nettoPositivo(offerta));
 
         transazioneRepository.save(transazione);
     }
 
     @PutMapping("{transazione_id}")
-    public void updateTransazione(@PathVariable("transazione_id") Integer id, @RequestBody TemplateTransazione update, @PathVariable String transazione_id) {
+    public void updateTransazione(@PathVariable("transazione_id") Integer id, @RequestBody Transazione update) {
         if (transazioneRepository.findById(id).isPresent()) {
             Transazione nuova = transazioneRepository.getReferenceById(id);
-            nuova.setDataTransazione(update.dataTransazione());
-            nuova.setDescrizioneTransazione(update.descrizioneTransazione());
+            nuova.setDataTransazione(update.getDataTransazione());
+            nuova.setDescrizioneTransazione(update.getDescrizioneTransazione());
             transazioneRepository.save(nuova);
         }
     }
@@ -88,7 +95,23 @@ public class TransazioneController {
         transazioneRepository.deleteAll();
     }
 
-    record TemplateTransazione(Integer quantitaPunti, Date dataTransazione, String descrizioneTransazione,
-                               Integer idTessera, Integer idCommerciante, Integer idOfferta) {
+    @PatchMapping("{idTransazione}")
+    public void patchTransazione(@PathVariable("idTransazione") Integer id, @RequestBody Transazione update){
+        if (transazioneRepository.findById(id).isPresent()) {
+            Transazione transazione = transazioneRepository.getReferenceById(id);
+
+            if (transazione.getDescrizioneTransazione() != null) {
+                transazione.setDescrizioneTransazione(update.getDescrizioneTransazione());
+            }
+            if (transazione.getImportoTransazione() != null) {
+                transazione.setImportoTransazione(update.getImportoTransazione());
+            }
+            if (transazione.getDataTransazione() != null) {
+                transazione.setDataTransazione(update.getDataTransazione());
+            }
+            if (transazione.getCommerciante() != null) {
+                transazione.setCommerciante(update.getCommerciante());
+            }
+        }
     }
 }

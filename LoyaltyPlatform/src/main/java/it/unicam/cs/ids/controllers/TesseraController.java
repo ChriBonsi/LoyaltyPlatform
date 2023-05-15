@@ -14,57 +14,79 @@ import static it.unicam.cs.ids.controllers.ClienteController.checkOfferte;
 @RequestMapping("/tessere")
 public class TesseraController {
 
-    private final TesseraRepository tesseraRepo;
-    private final OffertaRepository offertaRepo;
+    private final TesseraRepository tesseraRepository;
+    private final OffertaRepository offertaRepository;
 
-
-    public TesseraController(TesseraRepository tesseraRepo, OffertaRepository offertaRepo) {
-        this.tesseraRepo = tesseraRepo;
-        this.offertaRepo = offertaRepo;
+    public TesseraController(TesseraRepository tesseraRepository, OffertaRepository offertaRepository) {
+        this.tesseraRepository = tesseraRepository;
+        this.offertaRepository = offertaRepository;
     }
 
     @GetMapping
     public List<Tessera> getTessere() {
-        return tesseraRepo.findAll();
+        return tesseraRepository.findAll();
     }
 
     @GetMapping("{idTessera}")
     public Tessera getTessera(@PathVariable("idTessera") Integer id) {
-        return tesseraRepo.findById(id).orElse(null);
+        return tesseraRepository.findById(id).orElse(null);
     }
 
     @PostMapping
-    public void addTessera(@RequestBody TemplateTessera request) {
+    public void addTessera(@RequestBody Tessera request) {
         Tessera tessera = new Tessera();
-        tessera.setPunteggio(request.punteggio());
-        tessera.setLivello(request.livello());
+        this.setAllFields(tessera, request);
         tessera.setDataCreazione(new Date(System.currentTimeMillis()));
 
-        tessera.setListaCoupon(checkOfferte(tessera.getLivello(), offertaRepo));
+        tessera.setListaCoupon(checkOfferte(tessera.getLivello(), offertaRepository));
 
-        tesseraRepo.save(tessera);
+        tesseraRepository.save(tessera);
     }
 
     @PutMapping("{tesseraID}")
-    public void updateTessera(@PathVariable("tesseraID") Integer id, @RequestBody TesseraController.TemplateTessera updated) {
-        if (tesseraRepo.findById(id).isPresent()) {
-            Tessera tessera = tesseraRepo.findById(id).get();
-            tessera.setLivello(updated.livello());
-            tessera.setPunteggio(updated.punteggio());
-            tesseraRepo.save(tessera);
+    public void updateTessera(@PathVariable("tesseraID") Integer id, @RequestBody Tessera request) {
+        if (tesseraRepository.findById(id).isPresent()) {
+            Tessera tessera = tesseraRepository.findById(id).get();
+            this.setAllFields(tessera, request);
+            tessera.setDataCreazione(request.getDataCreazione());
+
+            tesseraRepository.save(tessera);
         }
     }
 
     @DeleteMapping("{idTessera}")
     public void deleteTessera(@PathVariable("idTessera") Integer id) {
-        tesseraRepo.deleteById(id);
+        tesseraRepository.deleteById(id);
     }
 
     @DeleteMapping
     public void deleteAllTessere() {
-        tesseraRepo.deleteAll();
+        tesseraRepository.deleteAll();
     }
 
-    private record TemplateTessera(Integer punteggio, Integer livello) {
+    @PatchMapping("{idTessera}")
+    public void patchTessera(@PathVariable("idTessera") Integer id, @RequestBody Tessera update) {
+        if (tesseraRepository.findById(id).isPresent()) {
+            Tessera tessera = tesseraRepository.getReferenceById(id);
+
+            if (update.getPunteggioDisponibile() != null) {
+                tessera.setPunteggioDisponibile(update.getPunteggioDisponibile());
+            }
+            if (update.getPunteggioTotale() != null) {
+                tessera.setPunteggioTotale(update.getPunteggioTotale());
+            }
+            if (update.getLivello() != null) {
+                tessera.setLivello(update.getLivello());
+            }
+            if (update.getDataCreazione() != null) {
+                tessera.setDataCreazione(update.getDataCreazione());
+            }
+        }
+    }
+
+    public void setAllFields(Tessera tessera, Tessera request) {
+        tessera.setPunteggioDisponibile(request.getPunteggioDisponibile());
+        tessera.setPunteggioTotale(request.getPunteggioTotale());
+        tessera.setLivello(request.getLivello());
     }
 }
