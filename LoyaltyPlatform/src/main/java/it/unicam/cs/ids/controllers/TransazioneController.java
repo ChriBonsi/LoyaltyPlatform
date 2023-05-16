@@ -96,7 +96,7 @@ public class TransazioneController {
     }
 
     @PatchMapping("{idTransazione}")
-    public void patchTransazione(@PathVariable("idTransazione") Integer id, @RequestBody Transazione update){
+    public void patchTransazione(@PathVariable("idTransazione") Integer id, @RequestBody Transazione update) {
         if (transazioneRepository.findById(id).isPresent()) {
             Transazione transazione = transazioneRepository.getReferenceById(id);
 

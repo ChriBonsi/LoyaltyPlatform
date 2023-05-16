@@ -1,14 +1,9 @@
 package it.unicam.cs.ids.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.MappedSuperclass;
-import jakarta.validation.constraints.Email;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-
+import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
+import javax.validation.constraints.Email;
 import java.sql.Date;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Objects;
 
 @MappedSuperclass
@@ -20,7 +15,7 @@ public abstract class UtenteGenerico {
     @Column(length = 25)
     private String cognome;
 
-    @Column(nullable = false, unique = true, length = 50) //aggiunto che non può essere nulla
+    @Column(nullable = false, unique = true, length = 50)
     @Email
     private String email;
 
@@ -30,26 +25,19 @@ public abstract class UtenteGenerico {
     @Column
     private Date dataNascita;
 
-    //Da qui sto aggiungendo roba del login
-    @Column(nullable = false)
-    private String password;
-
-    @Column(nullable = false)
-    private String ruolo;
-
-    //finisce la roba del login
-
-    protected UtenteGenerico(String nome, String cognome, String email, String numeroTelefono, Date dataNascita, String password, String ruolo) {
+    private UtenteGenerico(String nome, String cognome, String email, String numeroTelefono, Date dataNascita, String password, String ruolo) {
         this.nome = nome;
         this.cognome = cognome;
         this.email = email;
         this.numeroTelefono = numeroTelefono;
         this.dataNascita = dataNascita;
-        this.password = password;
-        this.ruolo = ruolo;
     }
 
     protected UtenteGenerico() {
+    }
+
+    public UtenteGenerico(String name, String cognome, String email, String numeroTelefono, Date dataNascita) {
+
     }
 
     public static <T extends UtenteGenerico> void setUtenteFields(T toUpdate, T sorgente) {
@@ -58,8 +46,6 @@ public abstract class UtenteGenerico {
         toUpdate.setEmail(sorgente.getEmail());
         toUpdate.setNumeroTelefono(sorgente.getNumeroTelefono());
         toUpdate.setDataNascita(sorgente.getDataNascita());
-        toUpdate.setPassword(sorgente.getPassword());
-        toUpdate.setRuolo(sorgente.getRuolo());
     }
 
     public static <T extends UtenteGenerico> void setNonNullFields(T toUpdate, T sorgente) {
@@ -78,14 +64,8 @@ public abstract class UtenteGenerico {
         if (toUpdate.getEmail() != null) {
             sorgente.setEmail(toUpdate.getEmail());
         }
-        if (toUpdate.getPassword() != null) {
-            sorgente.setPassword(toUpdate.getPassword());
-        }
-        if (toUpdate.getRuolo() != null) {
-            sorgente.setRuolo(toUpdate.getRuolo());
-        }
     }
-    
+
     @Override
     public String toString() {
         return "UtenteGenerico{" + "nome='" + nome + '\'' + ", cognome='" + cognome + '\'' + ", email='" + email + '\'' + ", numeroTelefono='" + numeroTelefono + '\'' + ", dataNascita=" + dataNascita + '}';
@@ -96,12 +76,12 @@ public abstract class UtenteGenerico {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UtenteGenerico that = (UtenteGenerico) o;
-        return Objects.equals(nome, that.nome) && Objects.equals(cognome, that.cognome) && Objects.equals(email, that.email) && Objects.equals(numeroTelefono, that.numeroTelefono) && Objects.equals(dataNascita, that.dataNascita) && Objects.equals(password, that.password) && Objects.equals(ruolo, that.ruolo);
+        return Objects.equals(nome, that.nome) && Objects.equals(cognome, that.cognome) && Objects.equals(email, that.email) && Objects.equals(numeroTelefono, that.numeroTelefono) && Objects.equals(dataNascita, that.dataNascita);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(nome, cognome, email, numeroTelefono, dataNascita, ruolo, password);
+        return Objects.hash(nome, cognome, email, numeroTelefono, dataNascita);
     }
 
     public String getNome() {
@@ -143,58 +123,4 @@ public abstract class UtenteGenerico {
     public void setDataNascita(Date dataNascita) {
         this.dataNascita = dataNascita;
     }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getRuolo() {
-        return ruolo;
-    }
-
-    public void setRuolo(String ruolo) {
-        this.ruolo = ruolo;
-    }
-
-    //Da qui metto roba del login
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton(new SimpleGrantedAuthority(ruolo));
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public String getUsername() {
-        return email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
-    //Da qui finisce roba del login
 }

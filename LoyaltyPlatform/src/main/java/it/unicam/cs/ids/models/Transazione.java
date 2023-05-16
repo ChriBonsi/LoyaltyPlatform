@@ -1,9 +1,8 @@
 package it.unicam.cs.ids.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import jakarta.annotation.Nullable;
-import jakarta.persistence.*;
 
+import javax.persistence.*;
 import java.sql.Date;
 import java.util.Objects;
 
@@ -31,11 +30,11 @@ public class Transazione {
     @JsonBackReference
     private Tessera tessera;
 
-    @Nullable
+
     @OneToOne
     private Offerta offertaUsata;
 
-    public Transazione(Integer id, Double importoTransazione, Date dataTransazione, String descrizioneTransazione, @Nullable Offerta offertaUsata) {
+    public Transazione(Integer id, Double importoTransazione, Date dataTransazione, String descrizioneTransazione, Offerta offertaUsata) {
         this.id = id;
         this.importoTransazione = importoTransazione;
         this.dataTransazione = dataTransazione;
@@ -99,12 +98,11 @@ public class Transazione {
         this.tessera = tessera;
     }
 
-    @Nullable
     public Offerta getOffertaUsata() {
         return offertaUsata;
     }
 
-    public void setOffertaUsata(@Nullable Offerta offertaUsata) {
+    public void setOffertaUsata(Offerta offertaUsata) {
         this.offertaUsata = offertaUsata;
     }
 
@@ -133,7 +131,7 @@ public class Transazione {
         if (offerta == null) {
             return this.convertiInPunti();
         } else {
-            return offerta.getPuntiBonus() + (int) (this.convertiInPunti()*offerta.getMoltiplicatore());
+            return offerta.getPuntiBonus() + (int) (this.convertiInPunti() * offerta.getMoltiplicatore());
         }
     }
 

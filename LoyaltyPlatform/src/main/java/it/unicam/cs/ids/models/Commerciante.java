@@ -1,6 +1,6 @@
 package it.unicam.cs.ids.models;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 
 import java.sql.Date;
 import java.util.List;
