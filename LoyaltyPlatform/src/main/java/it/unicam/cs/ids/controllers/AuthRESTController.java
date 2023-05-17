@@ -4,11 +4,8 @@ import it.unicam.cs.ids.message.request.LoginForm;
 import it.unicam.cs.ids.message.request.SignUpForm;
 import it.unicam.cs.ids.message.response.JwtResponse;
 import it.unicam.cs.ids.message.response.ResponseMessage;
-import it.unicam.cs.ids.models.Role;
-import it.unicam.cs.ids.models.RoleName;
-import it.unicam.cs.ids.models.User;
-import it.unicam.cs.ids.repositories.RoleRepository;
-import it.unicam.cs.ids.repositories.UserRepository;
+import it.unicam.cs.ids.models.*;
+import it.unicam.cs.ids.repositories.*;
 import it.unicam.cs.ids.security.jwt.JwtProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,8 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200", maxAge = 3600)
@@ -34,7 +30,7 @@ public class AuthRESTController {
     AuthenticationManager authenticationManager;
 
     @Autowired
-    UserRepository userRepository;
+    AccountRepository accountRepository;
 
     @Autowired
     RoleRepository roleRepository;
@@ -45,45 +41,93 @@ public class AuthRESTController {
     @Autowired
     JwtProvider jwtProvider;
 
+    @Autowired
+    ClienteRepository clienteRepository;
+
+    @Autowired
+    CommercianteRepository commercianteRepository;
+
+    @Autowired
+    AmministratoreRepository amministratoreRepository;
+
+    @Autowired
+    AnalistaRepository analistaRepository;
+
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginForm loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String jwt = jwtProvider.generateJwtToken(authentication);
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-        return ResponseEntity.ok(new JwtResponse(jwt, userDetails.getUsername(), userDetails.getAuthorities()));
+        Optional<Account> account = accountRepository.findByEmail(userDetails.getUsername());
+
+        return ResponseEntity.ok(new JwtResponse(jwt, userDetails.getUsername(), userDetails.getAuthorities(), account.get().getUniqueRole_id().toString()));
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpForm signUpRequest) {
+    public <T extends UtenteGenerico> ResponseEntity<?> registerUser(@Valid @RequestBody SignUpForm signUpRequest, T templateUtente) {
 
-        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-            return new ResponseEntity<>(new ResponseMessage("Fail -> Username is already taken."), HttpStatus.BAD_REQUEST);
+        if (accountRepository.existsByEmail(signUpRequest.getEmail())) {
+            return new ResponseEntity<>(new ResponseMessage("Fail -> Email is already taken."), HttpStatus.BAD_REQUEST);
         }
 
-        // Create user account
-        User user = new User(signUpRequest.getUsername(), passwordEncoder.encode(signUpRequest.getPassword()));
+        // Crea account
+        Account account = new Account(signUpRequest.getEmail(), passwordEncoder.encode(signUpRequest.getPassword()));
 
-        Set<String> strRoles = signUpRequest.getRole();
-        Set<Role> roles = new HashSet<>();
+        String ruolo = signUpRequest.getRuolo();
+        Set<Ruolo> ruoli = new HashSet<>();
 
-        strRoles.forEach(role -> {
-            switch (role) {
-                case "admin":
-                    Role adminRole = roleRepository.findByName(RoleName.ROLE_ADMIN).orElseThrow(() -> new RuntimeException("Fail -> Cause: Admin Role not found."));
-                    roles.add(adminRole);
-                    break;
-                default:
-                    Role userRole = roleRepository.findByName(RoleName.ROLE_USER).orElseThrow(() -> new RuntimeException("Fail -> Cause: User Role not found."));
-                    roles.add(userRole);
-            }
-        });
+        //TODO finire la creazione dei profili
+        switch (ruolo) {
+            case "cliente":
+                // crea cliente
+                Cliente cliente = new Cliente();
+                clienteRepository.save(cliente);
+                account.setUniqueRole_id(cliente.getId());
+                aggiungiConControllo(RoleName.CLIENTE, ruoli);
+                break;
 
-        user.setRoles(roles);
-        userRepository.save(user);
+            case "commerciante":
+                // create commerciante
+                Commerciante commerciante = new Commerciante();
+                commercianteRepository.save(commerciante);
+                account.setUniqueRole_id(commerciante.getId());
+                aggiungiConControllo(RoleName.COMMERCIANTE, ruoli);
+                break;
+
+            case "analista":
+                Analista analista = new Analista();
+                analistaRepository.save(analista);
+                account.setUniqueRole_id(analista.getId());
+                aggiungiConControllo(RoleName.ANALISTA, ruoli);
+                break;
+
+            case "admin":
+                Amministratore amministratore = new Amministratore();
+                amministratoreRepository.save(amministratore);
+                account.setUniqueRole_id(amministratore.getId());
+                aggiungiConControllo(RoleName.ADMIN, ruoli);
+
+                break;
+
+            default:
+                Ruolo ruoloAccount = roleRepository.findByName(RoleName.USER).orElseThrow(() -> new RuntimeException("Fail -> Cause: User Role not found."));
+                ruoli.add(ruoloAccount);
+        }
+
+        account.setRoles(ruoli);
+        System.out.println(account.getUniqueRole_id());
+        accountRepository.save(account);
 
         return new ResponseEntity<>(new ResponseMessage("User registered successfully."), HttpStatus.OK);
+    }
+
+    private void aggiungiConControllo(RoleName nome, Set<Ruolo> set) {
+        nome.trasforma().forEach(ruolo -> {
+            Ruolo daAggiungere = roleRepository.findByName(ruolo).orElseThrow(() -> new RuntimeException("Fail -> Cause: " + ruolo + " Role not found."));
+            set.add(daAggiungere);
+        });
     }
 }

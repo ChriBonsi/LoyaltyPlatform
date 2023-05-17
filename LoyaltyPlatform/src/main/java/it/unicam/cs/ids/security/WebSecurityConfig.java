@@ -55,7 +55,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // next line for secured app
                 //.antMatchers("/restApi/students/**").hasAnyRole("ADMIN","USER") //hasRole("ADMIN")
                 // next app for not secured version (lecture with REST)
-                .antMatchers("/students/**").permitAll().antMatchers("/exampleSecurity/user").hasRole("USER").antMatchers("/exampleSecurity/admin").hasRole("ADMIN").anyRequest().authenticated().and().exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .antMatchers("/students/**").hasRole("STUDENT").antMatchers("/subject/**").hasAnyRole("TEACHER", "STUDENT").antMatchers("/teachers/**").hasRole("TEACHER") //.hasAnyRole("ADMIN","USER") //hasRole("ADMIN")
+                .antMatchers("/exampleSecurity/user").hasRole("USER").antMatchers("/exampleSecurity/admin").hasRole("ADMIN").anyRequest().authenticated().and().exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 

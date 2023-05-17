@@ -8,11 +8,11 @@ import java.util.Set;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class Account {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @NotBlank
     @Size(min = 3, max = 50)
@@ -23,21 +23,23 @@ public class User {
     private String password;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    private Set<Role> roles = new HashSet<>();
+    private Set<Ruolo> ruolos = new HashSet<>();
 
-    public User() {
+    private Integer uniqueRole_id;
+
+    public Account() {
     }
 
-    public User(@NotBlank @Size(min = 3, max = 50) String username, @NotBlank @Size(min = 6, max = 100) String password) {
+    public Account(@NotBlank @Size(min = 3, max = 50) String username, @NotBlank @Size(min = 6, max = 100) String password) {
         this.username = username;
         this.password = password;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -57,11 +59,20 @@ public class User {
         this.password = password;
     }
 
-    public Set<Role> getRoles() {
-        return roles;
+    public Set<Ruolo> getRoles() {
+        return ruolos;
     }
 
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
+    public void setRoles(Set<Ruolo> ruolos) {
+        this.ruolos = ruolos;
+    }
+
+
+    public Integer getUniqueRole_id() {
+        return uniqueRole_id;
+    }
+
+    public void setUniqueRole_id(Integer uniqueRole_id) {
+        this.uniqueRole_id = uniqueRole_id;
     }
 }

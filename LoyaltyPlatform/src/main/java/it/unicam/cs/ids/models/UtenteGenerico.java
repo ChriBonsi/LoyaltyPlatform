@@ -25,6 +25,7 @@ public abstract class UtenteGenerico {
     @Column
     private Date dataNascita;
 
+
     private UtenteGenerico(String nome, String cognome, String email, String numeroTelefono, Date dataNascita, String password, String ruolo) {
         this.nome = nome;
         this.cognome = cognome;

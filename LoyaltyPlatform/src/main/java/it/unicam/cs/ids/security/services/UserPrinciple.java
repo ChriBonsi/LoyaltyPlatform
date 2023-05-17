@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import it.unicam.cs.ids.models.User;
+import it.unicam.cs.ids.models.Account;
 
 import java.util.Collection;
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 public class UserPrinciple implements UserDetails {
 
-    private Long id;
+    private Integer id;
 
     private String username;
 
@@ -22,20 +22,20 @@ public class UserPrinciple implements UserDetails {
 
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserPrinciple(Long id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
+    public UserPrinciple(Integer id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.authorities = authorities;
     }
 
-    public static UserPrinciple build(User user) {
-        List<GrantedAuthority> authorities = user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName().name())).collect(Collectors.toList());
+    public static UserPrinciple build(Account account) {
+        List<GrantedAuthority> authorities = account.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName().name())).collect(Collectors.toList());
 
-        return new UserPrinciple(user.getId(), user.getUsername(), user.getPassword(), authorities);
+        return new UserPrinciple(account.getId(), account.getUsername(), account.getPassword(), authorities);
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
