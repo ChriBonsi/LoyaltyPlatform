@@ -30,12 +30,14 @@ public class Tessera {
     @OneToOne(mappedBy = "tessera")
     private Cliente cliente;
 
+
     @OneToMany(cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<Offerta> listaCoupon;
     //TODO lista cronologia delle offerte
 
     @OneToMany(mappedBy = "tessera", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+    @JsonManagedReference(value = "tessera")
     private List<Transazione> cronologiaTransazioni = new ArrayList<>();
 
     public Tessera(Integer id, Integer punteggioDisponibile, Integer punteggioTotale, Integer livello, Date dataCreazione, Cliente cliente) {
@@ -86,6 +88,7 @@ public class Tessera {
     public static Tessera inizializzaNuovaTessera() {
         Tessera tessera = new Tessera();
         tessera.setPunteggioDisponibile(0);
+        tessera.setPunteggioTotale(0);
         tessera.setLivello(0);
         tessera.setDataCreazione(new Date(System.currentTimeMillis()));
         return tessera;

@@ -12,7 +12,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -51,12 +50,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.cors().and().csrf().disable().authorizeRequests().antMatchers("/auth/**").permitAll()
-                // next line for secured app
-                //.antMatchers("/restApi/students/**").hasAnyRole("ADMIN","USER") //hasRole("ADMIN")
-                // next app for not secured version (lecture with REST)
-                .antMatchers("/students/**").hasRole("STUDENT").antMatchers("/subject/**").hasAnyRole("TEACHER", "STUDENT").antMatchers("/teachers/**").hasRole("TEACHER") //.hasAnyRole("ADMIN","USER") //hasRole("ADMIN")
-                .antMatchers("/exampleSecurity/user").hasRole("USER").antMatchers("/exampleSecurity/admin").hasRole("ADMIN").anyRequest().authenticated().and().exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.cors().and().csrf().disable().authorizeRequests().antMatchers("/auth/**").permitAll();
+        // next line for secured app
+        //.antMatchers("/restApi/students/**").hasAnyRole("ADMIN","USER") //hasRole("ADMIN")
+        // next app for not secured version (lecture with REST)
+        //.antMatchers("/students/**").hasRole("STUDENT").antMatchers("/subject/**").hasAnyRole("TEACHER", "STUDENT").antMatchers("/teachers/**").hasRole("TEACHER") //.hasAnyRole("ADMIN","USER") //hasRole("ADMIN")
+        //.antMatchers("/exampleSecurity/user").hasRole("USER").antMatchers("/exampleSecurity/admin").hasRole("ADMIN").anyRequest().authenticated().and().exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 

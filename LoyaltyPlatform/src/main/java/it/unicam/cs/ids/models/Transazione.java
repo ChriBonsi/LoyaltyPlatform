@@ -1,6 +1,7 @@
 package it.unicam.cs.ids.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import java.sql.Date;
@@ -22,19 +23,20 @@ public class Transazione {
 
     @ManyToOne
     @JoinColumn(name = "commerciante_id")
-    @JsonBackReference
+    @JsonBackReference(value = "commerciante")
     private Commerciante commerciante;
 
     @ManyToOne
     @JoinColumn(name = "tessera_id")
-    @JsonBackReference
+    @JsonBackReference(value = "tessera")
     private Tessera tessera;
 
 
     @OneToOne
+    @Nullable
     private Offerta offertaUsata;
 
-    public Transazione(Integer id, Double importoTransazione, Date dataTransazione, String descrizioneTransazione, Offerta offertaUsata) {
+    public Transazione(Integer id, Double importoTransazione, Date dataTransazione, String descrizioneTransazione, @Nullable Offerta offertaUsata) {
         this.id = id;
         this.importoTransazione = importoTransazione;
         this.dataTransazione = dataTransazione;
@@ -98,11 +100,11 @@ public class Transazione {
         this.tessera = tessera;
     }
 
-    public Offerta getOffertaUsata() {
+    public @Nullable Offerta getOffertaUsata() {
         return offertaUsata;
     }
 
-    public void setOffertaUsata(Offerta offertaUsata) {
+    public void setOffertaUsata(@Nullable Offerta offertaUsata) {
         this.offertaUsata = offertaUsata;
     }
 

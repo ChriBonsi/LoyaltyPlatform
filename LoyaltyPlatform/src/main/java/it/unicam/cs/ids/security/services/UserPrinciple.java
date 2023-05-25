@@ -32,7 +32,7 @@ public class UserPrinciple implements UserDetails {
     public static UserPrinciple build(Account account) {
         List<GrantedAuthority> authorities = account.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName().name())).collect(Collectors.toList());
 
-        return new UserPrinciple(account.getId(), account.getUsername(), account.getPassword(), authorities);
+        return new UserPrinciple(account.getId(), account.getEmail(), account.getPassword(), authorities);
     }
 
     public Integer getId() {

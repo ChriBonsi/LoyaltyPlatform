@@ -73,6 +73,12 @@
             <version>23.0.0</version>
             <scope>compile</scope>
         </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>

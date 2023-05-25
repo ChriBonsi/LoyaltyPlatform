@@ -53,7 +53,7 @@ public class AuthRESTController {
     @Autowired
     AnalistaRepository analistaRepository;
 
-    @PostMapping("/login")
+/*    @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginForm loginRequest) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -113,7 +113,7 @@ public class AuthRESTController {
                 break;
 
             default:
-                Ruolo ruoloAccount = roleRepository.findByName(RoleName.USER).orElseThrow(() -> new RuntimeException("Fail -> Cause: User Role not found."));
+                Ruolo ruoloAccount = roleRepository.findByName(RoleName.CLIENTE).orElseThrow(() -> new RuntimeException("Fail -> Cause: User Role not found."));
                 ruoli.add(ruoloAccount);
         }
 
@@ -122,7 +122,7 @@ public class AuthRESTController {
         accountRepository.save(account);
 
         return new ResponseEntity<>(new ResponseMessage("User registered successfully."), HttpStatus.OK);
-    }
+    }*/
 
     private void aggiungiConControllo(RoleName nome, Set<Ruolo> set) {
         nome.trasforma().forEach(ruolo -> {

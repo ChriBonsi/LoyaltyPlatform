@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/exampleSecurity")
 public class ExampleSecurityRESTController {
 
-    @GetMapping("/user")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @GetMapping("/cliente")
+    @PreAuthorize("hasRole('CLIENTE') or hasRole('ADMIN')")
     public String userAccess() {
         return ">>> User Contents!";
     }
 
-    @GetMapping("/admin")
+    @GetMapping("/amministratore")
     @PreAuthorize("hasRole('ADMIN')")
     public String adminAccess() {
         return ">>> Admin Contents";

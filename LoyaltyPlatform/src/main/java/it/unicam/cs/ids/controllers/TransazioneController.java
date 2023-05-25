@@ -7,6 +7,7 @@ import it.unicam.cs.ids.repositories.CommercianteRepository;
 import it.unicam.cs.ids.repositories.OffertaRepository;
 import it.unicam.cs.ids.repositories.TesseraRepository;
 import it.unicam.cs.ids.repositories.TransazioneRepository;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
@@ -38,22 +39,23 @@ public class TransazioneController {
     }
 
     @PostMapping
-    public void addTransazione(@RequestBody Transazione request) {
+    public void addTransazione(@RequestBody TemplateTransazione request) {
         Transazione transazione = new Transazione();
-        transazione.setImportoTransazione(request.getImportoTransazione());
-        transazione.setDataTransazione(new Date(System.currentTimeMillis()));
-        transazione.setDescrizioneTransazione(request.getDescrizioneTransazione());
-        transazione.setCommerciante(commercianteRepository.getReferenceById(request.getIdCommerciante()));
 
-        Tessera tessera = tesseraRepository.getReferenceById(request.getIdTessera());
+        transazione.setImportoTransazione(request.importoTransazione());
+        transazione.setDataTransazione(new Date(System.currentTimeMillis()));
+        transazione.setDescrizioneTransazione(request.descrizioneTransazione());
+        transazione.setCommerciante(commercianteRepository.getReferenceById(request.idCommerciante()));
+
+        Tessera tessera = tesseraRepository.getReferenceById(request.idTessera());
         transazione.setTessera(tessera);
 
         Offerta offerta = null;
 
-        if (offertaRepository.findById(request.getIdOffertaUsata()).isPresent()) {
-            offerta = offertaRepository.getReferenceById(request.getIdOffertaUsata());
+        if (request.idOfferta != null && offertaRepository.findById(request.idOfferta()).isPresent()) {
+            offerta = offertaRepository.getReferenceById(request.idOfferta());
             if (offerta.getPuntiNecessari() <= tessera.getPunteggioDisponibile()) {
-                transazione.setOffertaUsata(offertaRepository.getReferenceById(request.getIdOffertaUsata()));
+                transazione.setOffertaUsata(offertaRepository.getReferenceById(request.idOfferta()));
                 if (offerta.consumabile()) {
                     tessera.removeCoupon(offerta);
                 }
@@ -113,5 +115,9 @@ public class TransazioneController {
                 transazione.setCommerciante(update.getCommerciante());
             }
         }
+    }
+
+    private record TemplateTransazione(Double importoTransazione, String descrizioneTransazione, Integer idTessera,
+                                       Integer idCommerciante, @Nullable Integer idOfferta) {
     }
 }

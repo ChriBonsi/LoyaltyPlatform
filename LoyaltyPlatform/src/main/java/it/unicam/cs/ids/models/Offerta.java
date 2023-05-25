@@ -1,5 +1,7 @@
 package it.unicam.cs.ids.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 
 import java.sql.Date;
@@ -31,7 +33,12 @@ public class Offerta {
 
     private Double moltiplicatore;
 
-    public Offerta(Integer livello, Date dataInizio, Date dataScadenza, String nomeOfferta, String descrizioneOfferta, boolean consumabile, Integer costoPunti, Integer puntiBonus) {
+    @ManyToOne
+    @JoinColumn(name = "tessera_id")
+    @JsonBackReference
+    private Tessera tessera;
+
+    public Offerta(Integer livello, Date dataInizio, Date dataScadenza, String nomeOfferta, String descrizioneOfferta, boolean consumabile, Integer costoPunti, Integer puntiBonus, Tessera tessera) {
         this.livello = livello;
         this.dataInizio = dataInizio;
         this.dataScadenza = dataScadenza;
@@ -40,6 +47,7 @@ public class Offerta {
         this.consumabile = consumabile;
         this.puntiNecessari = costoPunti;
         this.puntiBonus = puntiBonus;
+        this.tessera = tessera;
     }
 
     public Offerta() {
@@ -141,5 +149,13 @@ public class Offerta {
 
     public void setMoltiplicatore(Double moltiplicatore) {
         this.moltiplicatore = moltiplicatore;
+    }
+
+    public Tessera getTessera() {
+        return tessera;
+    }
+
+    public void setTessera(Tessera tessera) {
+        this.tessera = tessera;
     }
 }

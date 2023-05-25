@@ -16,22 +16,22 @@ public class Account {
 
     @NotBlank
     @Size(min = 3, max = 50)
-    private String username;
+    private String email;
 
     @NotBlank
     @Size(min = 6, max = 100)
     private String password;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    private Set<Ruolo> ruolos = new HashSet<>();
+    private Set<Ruolo> ruoli = new HashSet<>();
 
     private Integer uniqueRole_id;
 
     public Account() {
     }
 
-    public Account(@NotBlank @Size(min = 3, max = 50) String username, @NotBlank @Size(min = 6, max = 100) String password) {
-        this.username = username;
+    public Account(@NotBlank @Size(min = 3, max = 50) String email, @NotBlank @Size(min = 6, max = 100) String password) {
+        this.email = email;
         this.password = password;
     }
 
@@ -43,12 +43,12 @@ public class Account {
         this.id = id;
     }
 
-    public String getUsername() {
-        return username;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setEmail(String username) {
+        this.email = username;
     }
 
     public String getPassword() {
@@ -60,11 +60,11 @@ public class Account {
     }
 
     public Set<Ruolo> getRoles() {
-        return ruolos;
+        return ruoli;
     }
 
-    public void setRoles(Set<Ruolo> ruolos) {
-        this.ruolos = ruolos;
+    public void setRoles(Set<Ruolo> setRuoli) {
+        this.ruoli = setRuoli;
     }
 
 
