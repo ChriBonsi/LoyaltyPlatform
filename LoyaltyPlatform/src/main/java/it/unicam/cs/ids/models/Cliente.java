@@ -24,6 +24,7 @@ public class Cliente extends UtenteGenerico {
 
     public Cliente() {
         super();
+        tessera = new Tessera();
     }
 
     @Override

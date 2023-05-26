@@ -33,10 +33,6 @@ public class Offerta {
 
     private Double moltiplicatore;
 
-    @ManyToOne
-    @JoinColumn(name = "tessera_id")
-    @JsonBackReference
-    private Tessera tessera;
 
     public Offerta(Integer livello, Date dataInizio, Date dataScadenza, String nomeOfferta, String descrizioneOfferta, boolean consumabile, Integer costoPunti, Integer puntiBonus, Tessera tessera) {
         this.livello = livello;
@@ -47,7 +43,6 @@ public class Offerta {
         this.consumabile = consumabile;
         this.puntiNecessari = costoPunti;
         this.puntiBonus = puntiBonus;
-        this.tessera = tessera;
     }
 
     public Offerta() {
@@ -151,11 +146,4 @@ public class Offerta {
         this.moltiplicatore = moltiplicatore;
     }
 
-    public Tessera getTessera() {
-        return tessera;
-    }
-
-    public void setTessera(Tessera tessera) {
-        this.tessera = tessera;
-    }
 }

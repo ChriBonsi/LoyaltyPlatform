@@ -32,9 +32,7 @@ public class Tessera {
 
 
     @OneToMany(cascade = CascadeType.ALL)
-    @JsonManagedReference
     private List<Offerta> listaCoupon;
-    //TODO lista cronologia delle offerte
 
     @OneToMany(mappedBy = "tessera", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference(value = "tessera")

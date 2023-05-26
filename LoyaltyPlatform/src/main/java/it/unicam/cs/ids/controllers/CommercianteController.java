@@ -32,7 +32,7 @@ public class CommercianteController {
     @PostMapping
     public void addCommerciante(@RequestBody Commerciante request) {
         Commerciante commerciante = new Commerciante();
-        this.setAllFields(commerciante, request);
+        setAllFields(commerciante, request);
         commercianteRepository.save(commerciante);
     }
 
@@ -40,7 +40,7 @@ public class CommercianteController {
     public void updateCommerciante(@PathVariable("commerciante_id") Integer id, @RequestBody Commerciante update) {
         if (commercianteRepository.findById(id).isPresent()) {
             Commerciante commerciante = commercianteRepository.getReferenceById(id);
-            this.setAllFields(commerciante, update);
+            setAllFields(commerciante, update);
             commercianteRepository.save(commerciante);
         }
     }
@@ -72,7 +72,7 @@ public class CommercianteController {
         }
     }
 
-    public void setAllFields(Commerciante toUpdate, Commerciante toSet) {
+    public static void setAllFields(Commerciante toUpdate, Commerciante toSet) {
         setUtenteFields(toUpdate, toSet);
         toUpdate.setRagioneSociale(toSet.getRagioneSociale());
         toUpdate.setPartitaIVA(toSet.getPartitaIVA());

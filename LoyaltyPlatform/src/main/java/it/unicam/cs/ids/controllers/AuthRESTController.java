@@ -19,7 +19,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+
+import static it.unicam.cs.ids.controllers.ClienteController.checkOfferte;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200", maxAge = 3600)
@@ -33,7 +37,7 @@ public class AuthRESTController {
     AccountRepository accountRepository;
 
     @Autowired
-    RoleRepository roleRepository;
+    RuoloRepository ruoloRepository;
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -53,7 +57,20 @@ public class AuthRESTController {
     @Autowired
     AnalistaRepository analistaRepository;
 
-/*    @PostMapping("/login")
+    @Autowired
+    TesseraRepository tesseraRepository;
+
+    @Autowired
+    OffertaRepository offertaRepository;
+
+    @PostMapping("/test")
+    public void test(@RequestBody Cliente cliente) {
+        ClienteController a = new ClienteController(clienteRepository, tesseraRepository, offertaRepository);
+        a.addCustomer(cliente);
+    }
+
+
+    @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginForm loginRequest) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -67,66 +84,95 @@ public class AuthRESTController {
     }
 
     @PostMapping("/signup")
-    public <T extends UtenteGenerico> ResponseEntity<?> registerUser(@Valid @RequestBody SignUpForm signUpRequest, T templateUtente) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpForm signUpRequest) {
 
         if (accountRepository.existsByEmail(signUpRequest.getEmail())) {
             return new ResponseEntity<>(new ResponseMessage("Fail -> Email is already taken."), HttpStatus.BAD_REQUEST);
+        } else {
+            // Crea account
+            Account account = new Account(signUpRequest.getEmail(), passwordEncoder.encode(signUpRequest.getPassword()));
+
+            String ruolo = signUpRequest.getRuolo();
+            Set<Ruolo> ruoli = new HashSet<>();
+
+            //TODO finire la creazione dei profili
+            switch (ruolo) {
+                case "cliente":
+                    // crea cliente
+                    Cliente cliente = new Cliente();
+                    setFields(cliente, signUpRequest);
+
+                    Tessera tessera = Tessera.inizializzaNuovaTessera();
+                    tessera.setListaCoupon(checkOfferte(tessera.getLivello(), offertaRepository));
+                    cliente.setTessera(tessera);
+                    tesseraRepository.save(tessera);
+
+                    clienteRepository.save(cliente);
+
+                    account.setUniqueRole_id(cliente.getId());
+                    aggiungiConControllo(RoleName.CLIENTE, ruoli);
+                    break;
+
+                case "commerciante":
+                    // create commerciante
+                    Commerciante commerciante = new Commerciante();
+                    setFields(commerciante, signUpRequest);
+                    commerciante.setRagioneSociale(signUpRequest.getRagioneSociale());
+                    commerciante.setPartitaIVA(signUpRequest.getPartitaIVA());
+                    commerciante.setIndirizzo(signUpRequest.getIndirizzo());
+
+
+                    commercianteRepository.save(commerciante);
+                    account.setUniqueRole_id(commerciante.getId());
+                    aggiungiConControllo(RoleName.COMMERCIANTE, ruoli);
+                    break;
+
+                case "analista":
+                    Analista analista = new Analista();
+                    setFields(analista, signUpRequest);
+
+                    analistaRepository.save(analista);
+                    account.setUniqueRole_id(analista.getId());
+                    aggiungiConControllo(RoleName.ANALISTA, ruoli);
+                    break;
+
+                case "admin":
+                    Amministratore amministratore = new Amministratore();
+                    setFields(amministratore, signUpRequest);
+
+                    amministratoreRepository.save(amministratore);
+                    account.setUniqueRole_id(amministratore.getId());
+                    aggiungiConControllo(RoleName.ADMIN, ruoli);
+                    break;
+
+                default:
+            }
+
+            account.setRoles(ruoli);
+            System.out.println(account.getUniqueRole_id());
+            accountRepository.save(account);
+
+            return new ResponseEntity<>(new ResponseMessage("User registered successfully."), HttpStatus.OK);
         }
+    }
 
-        // Crea account
-        Account account = new Account(signUpRequest.getEmail(), passwordEncoder.encode(signUpRequest.getPassword()));
+    private static <T extends UtenteGenerico> void setFields(T utenteGenerico, SignUpForm signUpRequest) {
+        utenteGenerico.setNome(signUpRequest.getNome());
+        utenteGenerico.setCognome(signUpRequest.getCognome());
+        utenteGenerico.setNumeroTelefono(signUpRequest.getNumeroTelefono());
+        utenteGenerico.setEmail(signUpRequest.getEmail());
+        utenteGenerico.setDataNascita(signUpRequest.getDataNascita());
 
-        String ruolo = signUpRequest.getRuolo();
-        Set<Ruolo> ruoli = new HashSet<>();
-
-        //TODO finire la creazione dei profili
-        switch (ruolo) {
-            case "cliente":
-                // crea cliente
-                Cliente cliente = new Cliente();
-                clienteRepository.save(cliente);
-                account.setUniqueRole_id(cliente.getId());
-                aggiungiConControllo(RoleName.CLIENTE, ruoli);
-                break;
-
-            case "commerciante":
-                // create commerciante
-                Commerciante commerciante = new Commerciante();
-                commercianteRepository.save(commerciante);
-                account.setUniqueRole_id(commerciante.getId());
-                aggiungiConControllo(RoleName.COMMERCIANTE, ruoli);
-                break;
-
-            case "analista":
-                Analista analista = new Analista();
-                analistaRepository.save(analista);
-                account.setUniqueRole_id(analista.getId());
-                aggiungiConControllo(RoleName.ANALISTA, ruoli);
-                break;
-
-            case "admin":
-                Amministratore amministratore = new Amministratore();
-                amministratoreRepository.save(amministratore);
-                account.setUniqueRole_id(amministratore.getId());
-                aggiungiConControllo(RoleName.ADMIN, ruoli);
-
-                break;
-
-            default:
-                Ruolo ruoloAccount = roleRepository.findByName(RoleName.CLIENTE).orElseThrow(() -> new RuntimeException("Fail -> Cause: User Role not found."));
-                ruoli.add(ruoloAccount);
+        if (utenteGenerico.getClass() == Commerciante.class) {
+            ((Commerciante) utenteGenerico).setRagioneSociale(signUpRequest.getRagioneSociale());
+            ((Commerciante) utenteGenerico).setIndirizzo(signUpRequest.getIndirizzo());
+            ((Commerciante) utenteGenerico).setPartitaIVA(signUpRequest.getPartitaIVA());
         }
-
-        account.setRoles(ruoli);
-        System.out.println(account.getUniqueRole_id());
-        accountRepository.save(account);
-
-        return new ResponseEntity<>(new ResponseMessage("User registered successfully."), HttpStatus.OK);
-    }*/
+    }
 
     private void aggiungiConControllo(RoleName nome, Set<Ruolo> set) {
         nome.trasforma().forEach(ruolo -> {
-            Ruolo daAggiungere = roleRepository.findByName(ruolo).orElseThrow(() -> new RuntimeException("Fail -> Cause: " + ruolo + " Role not found."));
+            Ruolo daAggiungere = ruoloRepository.findByName(ruolo).orElseThrow(() -> new RuntimeException("Fail -> Cause: " + ruolo + " Role not found."));
             set.add(daAggiungere);
         });
     }

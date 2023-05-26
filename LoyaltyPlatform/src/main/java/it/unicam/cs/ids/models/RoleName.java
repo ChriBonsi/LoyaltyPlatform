@@ -1,10 +1,19 @@
 package it.unicam.cs.ids.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.HashSet;
 import java.util.Set;
 
 public enum RoleName {
-    CLIENTE, ADMIN, ANALISTA, COMMERCIANTE;
+
+    @JsonProperty("CLIENTE") CLIENTE,
+
+    @JsonProperty("ADMIN") ADMIN,
+
+    @JsonProperty("ANALISTA") ANALISTA,
+
+    @JsonProperty("COMMERCIANTE") COMMERCIANTE;
 
     public Set<RoleName> trasforma() {
         Set<RoleName> setRuoli = new HashSet<>();

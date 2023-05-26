@@ -144,12 +144,4 @@ public class Transazione {
     public Integer getIdTessera() {
         return tessera.getId();
     }
-
-    public Integer getIdOffertaUsata() {
-        if (offertaUsata == null) {
-            return null;
-        } else {
-            return offertaUsata.getId();
-        }
-    }
 }

@@ -52,7 +52,7 @@ public class TransazioneController {
 
         Offerta offerta = null;
 
-        if (request.idOfferta != null && offertaRepository.findById(request.idOfferta()).isPresent()) {
+        if (offertaRepository.findById(request.idOfferta()).isPresent()) {
             offerta = offertaRepository.getReferenceById(request.idOfferta());
             if (offerta.getPuntiNecessari() <= tessera.getPunteggioDisponibile()) {
                 transazione.setOffertaUsata(offertaRepository.getReferenceById(request.idOfferta()));
