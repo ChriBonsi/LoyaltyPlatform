@@ -33,6 +33,11 @@ public class TransazioneController {
         return transazioneRepository.findById(id).orElse(null);
     }
 
+    @GetMapping("/tessera/{idTessera}")
+    public List<Transazione> getTransazioniByTessera(@PathVariable("idTessera") Integer id) {
+        return transazioneRepository.findAllByTessera(tesseraRepository.getReferenceById(id));
+    }
+
     @GetMapping
     public List<Transazione> getTransazioni() {
         return transazioneRepository.findAll();
