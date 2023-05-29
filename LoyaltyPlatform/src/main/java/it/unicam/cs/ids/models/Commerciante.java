@@ -11,7 +11,7 @@ public class Commerciante extends UtenteGenerico {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_comm")
-    @SequenceGenerator(name = "seq_comm", initialValue = 201, allocationSize = 1)
+    @SequenceGenerator(name = "seq_comm", allocationSize = 1)
     private Integer id;
 
     @Column(length = 50)

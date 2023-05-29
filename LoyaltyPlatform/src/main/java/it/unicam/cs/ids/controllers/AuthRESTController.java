@@ -19,9 +19,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.sql.SQLOutput;
+import java.util.*;
 
 import static it.unicam.cs.ids.controllers.ClienteController.checkOfferte;
 
@@ -35,9 +34,6 @@ public class AuthRESTController {
 
     @Autowired
     AccountRepository accountRepository;
-
-    @Autowired
-    RuoloRepository ruoloRepository;
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -63,10 +59,9 @@ public class AuthRESTController {
     @Autowired
     OffertaRepository offertaRepository;
 
-    @PostMapping("/test")
-    public void test(@RequestBody Cliente cliente) {
-        ClienteController a = new ClienteController(clienteRepository, tesseraRepository, offertaRepository);
-        a.addCustomer(cliente);
+    @GetMapping("/accounts")
+    public List<Account> test() {
+        return accountRepository.findAll();
     }
 
 
@@ -93,63 +88,47 @@ public class AuthRESTController {
             Account account = new Account(signUpRequest.getEmail(), passwordEncoder.encode(signUpRequest.getPassword()));
 
             String ruolo = signUpRequest.getRuolo();
-            Set<Ruolo> ruoli = new HashSet<>();
 
-            //TODO finire la creazione dei profili
             switch (ruolo) {
-                case "cliente":
+                case "cliente" -> {
                     // crea cliente
                     Cliente cliente = new Cliente();
                     setFields(cliente, signUpRequest);
-
                     Tessera tessera = Tessera.inizializzaNuovaTessera();
                     tessera.setListaCoupon(checkOfferte(tessera.getLivello(), offertaRepository));
                     cliente.setTessera(tessera);
                     tesseraRepository.save(tessera);
-
                     clienteRepository.save(cliente);
-
                     account.setUniqueRole_id(cliente.getId());
-                    aggiungiConControllo(RoleName.CLIENTE, ruoli);
-                    break;
-
-                case "commerciante":
+                }
+                case "commerciante" -> {
                     // create commerciante
                     Commerciante commerciante = new Commerciante();
                     setFields(commerciante, signUpRequest);
                     commerciante.setRagioneSociale(signUpRequest.getRagioneSociale());
                     commerciante.setPartitaIVA(signUpRequest.getPartitaIVA());
                     commerciante.setIndirizzo(signUpRequest.getIndirizzo());
-
-
                     commercianteRepository.save(commerciante);
                     account.setUniqueRole_id(commerciante.getId());
-                    aggiungiConControllo(RoleName.COMMERCIANTE, ruoli);
-                    break;
-
-                case "analista":
+                }
+                case "analista" -> {
                     Analista analista = new Analista();
                     setFields(analista, signUpRequest);
-
                     analistaRepository.save(analista);
                     account.setUniqueRole_id(analista.getId());
-                    aggiungiConControllo(RoleName.ANALISTA, ruoli);
-                    break;
-
-                case "admin":
+                }
+                case "admin" -> {
                     Amministratore amministratore = new Amministratore();
                     setFields(amministratore, signUpRequest);
-
                     amministratoreRepository.save(amministratore);
                     account.setUniqueRole_id(amministratore.getId());
-                    aggiungiConControllo(RoleName.ADMIN, ruoli);
-                    break;
-
-                default:
+                }
+                default -> {
+                    System.out.println("Ruolo non valido");
+                }
             }
 
-            account.setRoles(ruoli);
-            System.out.println(account.getUniqueRole_id());
+            account.setRuolo(ruolo);
             accountRepository.save(account);
 
             return new ResponseEntity<>(new ResponseMessage("User registered successfully."), HttpStatus.OK);
@@ -168,12 +147,5 @@ public class AuthRESTController {
             ((Commerciante) utenteGenerico).setIndirizzo(signUpRequest.getIndirizzo());
             ((Commerciante) utenteGenerico).setPartitaIVA(signUpRequest.getPartitaIVA());
         }
-    }
-
-    private void aggiungiConControllo(RoleName nome, Set<Ruolo> set) {
-        nome.trasforma().forEach(ruolo -> {
-            Ruolo daAggiungere = ruoloRepository.findByName(ruolo).orElseThrow(() -> new RuntimeException("Fail -> Cause: " + ruolo + " Role not found."));
-            set.add(daAggiungere);
-        });
     }
 }

@@ -1,21 +1,20 @@
 package it.unicam.cs.ids.security.services;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import it.unicam.cs.ids.models.Account;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import it.unicam.cs.ids.models.Account;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class UserPrinciple implements UserDetails {
 
-    private Integer id;
+    private final Integer id;
 
-    private String username;
+    private final String username;
 
     @JsonIgnore
     private String password;
@@ -30,7 +29,7 @@ public class UserPrinciple implements UserDetails {
     }
 
     public static UserPrinciple build(Account account) {
-        List<GrantedAuthority> authorities = account.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName().name())).collect(Collectors.toList());
+        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(account.getRuolo()));
 
         return new UserPrinciple(account.getId(), account.getEmail(), account.getPassword(), authorities);
     }

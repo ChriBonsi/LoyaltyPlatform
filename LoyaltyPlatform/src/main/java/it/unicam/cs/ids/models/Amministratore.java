@@ -10,7 +10,7 @@ public class Amministratore extends UtenteGenerico {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_amm")
-    @SequenceGenerator(name = "seq_amm", initialValue = 451, allocationSize = 1)
+    @SequenceGenerator(name = "seq_amm", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Integer id;
 

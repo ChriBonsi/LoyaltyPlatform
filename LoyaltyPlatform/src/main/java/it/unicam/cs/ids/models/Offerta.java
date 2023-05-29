@@ -1,9 +1,6 @@
 package it.unicam.cs.ids.models;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
 import javax.persistence.*;
-
 import java.sql.Date;
 import java.util.Objects;
 
@@ -12,7 +9,7 @@ public class Offerta {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_off")
-    @SequenceGenerator(name = "seq_off", initialValue = 1001, allocationSize = 1)
+    @SequenceGenerator(name = "seq_off", allocationSize = 1)
     private Integer id;
 
     @Column(length = 3)
@@ -145,5 +142,4 @@ public class Offerta {
     public void setMoltiplicatore(Double moltiplicatore) {
         this.moltiplicatore = moltiplicatore;
     }
-
 }

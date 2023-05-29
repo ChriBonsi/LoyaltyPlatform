@@ -83,13 +83,10 @@ public class ClienteController {
     static List<Offerta> checkOfferte(Integer livello, OffertaRepository offertaRepo) {
         List<Offerta> listaCoupon = new ArrayList<>();
         for (Offerta o : offertaRepo.findAll()) {
-            System.out.println("Offerta " + o.getId());
             if (o.getLivello() <= livello) {
                 listaCoupon.add(o);
-                System.out.print("da aggiungere");
             }
         }
-        System.out.println(listaCoupon.stream().toString());
         return listaCoupon;
     }
 }

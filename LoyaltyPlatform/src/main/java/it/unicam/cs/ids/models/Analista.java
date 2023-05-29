@@ -9,7 +9,7 @@ import java.util.Objects;
 public class Analista extends UtenteGenerico {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_an")
-    @SequenceGenerator(name = "seq_an", initialValue = 401, allocationSize = 1)
+    @SequenceGenerator(name = "seq_an", allocationSize = 1)
     private Integer id;
 
     public Analista(String nome, String cognome, String email, String numeroTelefono, Date dataNascita, Integer id) {

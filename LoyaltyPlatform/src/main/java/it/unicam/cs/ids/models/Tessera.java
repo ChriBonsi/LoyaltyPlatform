@@ -14,7 +14,7 @@ public class Tessera {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_tess")
-    @SequenceGenerator(name = "seq_tess", initialValue = 501, allocationSize = 1)
+    @SequenceGenerator(name = "seq_tess", allocationSize = 1)
     private Integer id;
 
     @Column(length = 5)
@@ -31,7 +31,8 @@ public class Tessera {
     private Cliente cliente;
 
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "tessera_coupon", joinColumns = @JoinColumn(name = "tessera_id"), inverseJoinColumns = @JoinColumn(name = "coupon_id"))
     private List<Offerta> listaCoupon;
 
     @OneToMany(mappedBy = "tessera", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -3,15 +3,14 @@ package it.unicam.cs.ids.models;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "users")
 public class Account {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_account")
+    @SequenceGenerator(name = "seq_account", allocationSize = 1)
     private Integer id;
 
     @NotBlank
@@ -22,8 +21,7 @@ public class Account {
     @Size(min = 6, max = 100)
     private String password;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    private Set<Ruolo> ruoli = new HashSet<>();
+    private String ruolo;
 
     private Integer uniqueRole_id;
 
@@ -59,14 +57,13 @@ public class Account {
         this.password = password;
     }
 
-    public Set<Ruolo> getRoles() {
-        return ruoli;
+    public String getRuolo() {
+        return ruolo;
     }
 
-    public void setRoles(Set<Ruolo> setRuoli) {
-        this.ruoli = setRuoli;
+    public void setRuolo(String ruolo) {
+        this.ruolo = ruolo;
     }
-
 
     public Integer getUniqueRole_id() {
         return uniqueRole_id;

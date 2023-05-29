@@ -11,7 +11,7 @@ import java.util.Objects;
 public class Transazione {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_trans")
-    @SequenceGenerator(name = "seq_trans", initialValue = 10001, allocationSize = 1)
+    @SequenceGenerator(name = "seq_trans", allocationSize = 1)
     private Integer id;
 
     private final static double PUNTI_PER_EURO = 0.5;
