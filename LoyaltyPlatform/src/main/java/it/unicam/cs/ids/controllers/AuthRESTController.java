@@ -19,8 +19,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.sql.SQLOutput;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 import static it.unicam.cs.ids.controllers.ClienteController.checkOfferte;
 
@@ -123,9 +123,8 @@ public class AuthRESTController {
                     amministratoreRepository.save(amministratore);
                     account.setUniqueRole_id(amministratore.getId());
                 }
-                default -> {
-                    System.out.println("Ruolo non valido");
-                }
+                default -> System.out.println("Ruolo non valido");
+
             }
 
             account.setRuolo(ruolo);
