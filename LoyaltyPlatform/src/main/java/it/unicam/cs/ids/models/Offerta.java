@@ -30,18 +30,6 @@ public class Offerta {
 
     private Double moltiplicatore;
 
-
-    public Offerta(Integer livello, Date dataInizio, Date dataScadenza, String nomeOfferta, String descrizioneOfferta, boolean consumabile, Integer costoPunti, Integer puntiBonus, Tessera tessera) {
-        this.livello = livello;
-        this.dataInizio = dataInizio;
-        this.dataScadenza = dataScadenza;
-        this.nomeOfferta = nomeOfferta;
-        this.descrizioneOfferta = descrizioneOfferta;
-        this.consumabile = consumabile;
-        this.puntiNecessari = costoPunti;
-        this.puntiBonus = puntiBonus;
-    }
-
     public Offerta() {
     }
 

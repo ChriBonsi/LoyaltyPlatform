@@ -7,6 +7,7 @@ import it.unicam.cs.ids.repositories.CommercianteRepository;
 import it.unicam.cs.ids.repositories.OffertaRepository;
 import it.unicam.cs.ids.repositories.TesseraRepository;
 import it.unicam.cs.ids.repositories.TransazioneRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,20 +17,21 @@ import java.util.List;
 @RestController
 @RequestMapping("/transazioni")
 public class TransazioneController {
-    private final TransazioneRepository transazioneRepository;
-    private final TesseraRepository tesseraRepository;
-    private final CommercianteRepository commercianteRepository;
-    private final OffertaRepository offertaRepository;
 
-    public TransazioneController(TransazioneRepository transazioneRepository, TesseraRepository tesseraRepository, CommercianteRepository commercianteRepository, OffertaRepository offertaRepository) {
-        this.transazioneRepository = transazioneRepository;
-        this.tesseraRepository = tesseraRepository;
-        this.commercianteRepository = commercianteRepository;
-        this.offertaRepository = offertaRepository;
-    }
+    @Autowired
+    private TransazioneRepository transazioneRepository;
+
+    @Autowired
+    private TesseraRepository tesseraRepository;
+
+    @Autowired
+    private CommercianteRepository commercianteRepository;
+
+    @Autowired
+    private OffertaRepository offertaRepository;
 
     @GetMapping("{idTransazione}")
-    public Transazione getTransazioni(@PathVariable("idTransazione") Integer id) {
+    public Transazione getTransazione(@PathVariable("idTransazione") Integer id) {
         return transazioneRepository.findById(id).orElse(null);
     }
 
@@ -59,19 +61,35 @@ public class TransazioneController {
 
         if (offertaRepository.findById(request.idOfferta()).isPresent()) {
             offerta = offertaRepository.getReferenceById(request.idOfferta());
-            if (offerta.getPuntiNecessari() <= tessera.getPunteggioDisponibile()) {
-                transazione.setOffertaUsata(offertaRepository.getReferenceById(request.idOfferta()));
-                if (offerta.consumabile()) {
-                    tessera.removeCoupon(offerta);
+
+            if (tessera.getListaCoupon().contains(offerta)) {
+
+                if (offerta.getPuntiNecessari() <= tessera.getPunteggioDisponibile()) {
+                    transazione.setOffertaUsata(offertaRepository.getReferenceById(request.idOfferta()));
+                    if (offerta.consumabile()) {
+                        tessera.removeCoupon(offerta);
+                    }
+                } else {
+                    offerta = null;
+                    System.out.println("Punti insufficienti");
                 }
+            }
+        }
+
+        if (request.usaCashback()) {
+            double diff = tessera.getCashbackDisponibile() - transazione.getImportoTransazione();
+
+            if (diff <= 0) {
+                tessera.setCashbackDisponibile(0);
             } else {
-                offerta = null;
-                System.out.println("Punti insufficienti");
+                tessera.setCashbackDisponibile(diff);
             }
         }
 
         tessera.addTransazione(transazione);
         tessera.aggiuntaPunti(transazione.ricalcolaPunteggio(offerta), transazione.nettoPositivo(offerta));
+        tessera.aggiornaLivello();
+        tessera.aggiuntaCashback(transazione.accumulaCashback());
 
         transazioneRepository.save(transazione);
     }
@@ -123,6 +141,6 @@ public class TransazioneController {
     }
 
     private record TemplateTransazione(Double importoTransazione, String descrizioneTransazione, Integer idTessera,
-                                       Integer idCommerciante, @Nullable Integer idOfferta) {
+                                       Integer idCommerciante, @Nullable Integer idOfferta, boolean usaCashback) {
     }
 }

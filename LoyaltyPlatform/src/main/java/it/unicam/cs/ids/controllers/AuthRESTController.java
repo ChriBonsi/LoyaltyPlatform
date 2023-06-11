@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static it.unicam.cs.ids.controllers.ClienteController.checkOfferte;
+import static it.unicam.cs.ids.controllers.ClienteController.VipAttivo;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200", maxAge = 3600)
@@ -59,14 +60,19 @@ public class AuthRESTController {
     @Autowired
     OffertaRepository offertaRepository;
 
+    @Autowired
+    EmailController emailController;
+
+    @Autowired
+    PianoVipRepository pianoVipRepository;
+
     @GetMapping("/accounts")
-    public List<Account> test() {
+    public List<Account> elencoAccount() {
         return accountRepository.findAll();
     }
 
-
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginForm loginRequest) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginForm loginRequest) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -75,36 +81,39 @@ public class AuthRESTController {
 
         Optional<Account> account = accountRepository.findByEmail(userDetails.getUsername());
 
+        PianoVip toSave = emailController.mailScadenze();
+
+        if (toSave != null) {
+            pianoVipRepository.save(toSave);
+        }
+
         return ResponseEntity.ok(new JwtResponse(jwt, userDetails.getUsername(), userDetails.getAuthorities(), account.get().getUniqueRole_id().toString()));
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpForm signUpRequest) {
+    public ResponseEntity<?> registrazioneUtente(@Valid @RequestBody SignUpForm signUpRequest) {
 
         if (accountRepository.existsByEmail(signUpRequest.getEmail())) {
             return new ResponseEntity<>(new ResponseMessage("Fail -> Email is already taken."), HttpStatus.BAD_REQUEST);
         } else {
-            // Crea account
             Account account = new Account(signUpRequest.getEmail(), passwordEncoder.encode(signUpRequest.getPassword()));
 
             String ruolo = signUpRequest.getRuolo();
 
             switch (ruolo) {
                 case "cliente" -> {
-                    // crea cliente
                     Cliente cliente = new Cliente();
-                    setFields(cliente, signUpRequest);
+                    setCampi(cliente, signUpRequest);
                     Tessera tessera = Tessera.inizializzaNuovaTessera();
-                    tessera.setListaCoupon(checkOfferte(tessera.getLivello(), offertaRepository));
+                    tessera.setListaCoupon(checkOfferte(tessera.getLivello(), offertaRepository, VipAttivo(tessera)));
                     cliente.setTessera(tessera);
                     tesseraRepository.save(tessera);
                     clienteRepository.save(cliente);
                     account.setUniqueRole_id(cliente.getId());
                 }
                 case "commerciante" -> {
-                    // create commerciante
                     Commerciante commerciante = new Commerciante();
-                    setFields(commerciante, signUpRequest);
+                    setCampi(commerciante, signUpRequest);
                     commerciante.setRagioneSociale(signUpRequest.getRagioneSociale());
                     commerciante.setPartitaIVA(signUpRequest.getPartitaIVA());
                     commerciante.setIndirizzo(signUpRequest.getIndirizzo());
@@ -113,20 +122,18 @@ public class AuthRESTController {
                 }
                 case "analista" -> {
                     Analista analista = new Analista();
-                    setFields(analista, signUpRequest);
+                    setCampi(analista, signUpRequest);
                     analistaRepository.save(analista);
                     account.setUniqueRole_id(analista.getId());
                 }
                 case "admin" -> {
                     Amministratore amministratore = new Amministratore();
-                    setFields(amministratore, signUpRequest);
+                    setCampi(amministratore, signUpRequest);
                     amministratoreRepository.save(amministratore);
                     account.setUniqueRole_id(amministratore.getId());
                 }
                 default -> System.out.println("Ruolo non valido");
-
             }
-
             account.setRuolo(ruolo);
             accountRepository.save(account);
 
@@ -134,7 +141,7 @@ public class AuthRESTController {
         }
     }
 
-    private static <T extends UtenteGenerico> void setFields(T utenteGenerico, SignUpForm signUpRequest) {
+    private static <T extends UtenteGenerico> void setCampi(T utenteGenerico, SignUpForm signUpRequest) {
         utenteGenerico.setNome(signUpRequest.getNome());
         utenteGenerico.setCognome(signUpRequest.getCognome());
         utenteGenerico.setNumeroTelefono(signUpRequest.getNumeroTelefono());

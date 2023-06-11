@@ -1,9 +1,6 @@
 package it.unicam.cs.ids.models;
 
 import javax.persistence.*;
-
-import java.sql.Date;
-import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -21,14 +18,6 @@ public class Commerciante extends UtenteGenerico {
 
     @Column(length = 50)
     private String indirizzo;
-
-    public Commerciante(String nome, String cognome, String email, String numeroTelefono, Date dataNascita, Integer id, String ragioneSociale, String partitaIVA, String indirizzo) {
-        super(nome, cognome, email, numeroTelefono, dataNascita);
-        this.id = id;
-        this.ragioneSociale = ragioneSociale;
-        this.partitaIVA = partitaIVA;
-        this.indirizzo = indirizzo;
-    }
 
     public Commerciante() {
         super();

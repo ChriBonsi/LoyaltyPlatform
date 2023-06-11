@@ -2,22 +2,20 @@ package it.unicam.cs.ids.controllers;
 
 import it.unicam.cs.ids.models.Analista;
 import it.unicam.cs.ids.repositories.AnalistaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static it.unicam.cs.ids.models.UtenteGenerico.setNonNullFields;
-import static it.unicam.cs.ids.models.UtenteGenerico.setUtenteFields;
+import static it.unicam.cs.ids.models.UtenteGenerico.setCampiNonNulli;
+import static it.unicam.cs.ids.models.UtenteGenerico.setCampiUtente;
 
 @RestController
 @RequestMapping("/analisti")
 public class AnalistaController {
 
+    @Autowired
     public AnalistaRepository analistaRepository;
-
-    public AnalistaController(AnalistaRepository analistaRepository) {
-        this.analistaRepository = analistaRepository;
-    }
 
     @GetMapping
     public List<Analista> getAnalisti() {
@@ -40,7 +38,7 @@ public class AnalistaController {
     }
 
     @DeleteMapping
-    public void deleteAllAnalista() {
+    public void deleteAllAnalisti() {
         analistaRepository.deleteAll();
     }
 
@@ -48,7 +46,7 @@ public class AnalistaController {
     public void updateAnalista(@PathVariable("idAnalista") Integer id, @RequestBody Analista update) {
         if (analistaRepository.findById(id).isPresent()) {
             Analista analista = analistaRepository.getReferenceById(id);
-            setUtenteFields(analista, update);
+            setCampiUtente(analista, update);
         }
     }
 
@@ -56,7 +54,7 @@ public class AnalistaController {
     public void patchAnalista(@PathVariable("idAnalista") Integer id, @RequestBody Analista update) {
         if (analistaRepository.findById(id).isPresent()) {
             Analista analista = analistaRepository.getReferenceById(id);
-            setNonNullFields(analista, update);
+            setCampiNonNulli(analista, update);
         }
     }
 }

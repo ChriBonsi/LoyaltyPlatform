@@ -25,23 +25,10 @@ public abstract class UtenteGenerico {
     @Column
     private Date dataNascita;
 
-
-    private UtenteGenerico(String nome, String cognome, String email, String numeroTelefono, Date dataNascita, String password, String ruolo) {
-        this.nome = nome;
-        this.cognome = cognome;
-        this.email = email;
-        this.numeroTelefono = numeroTelefono;
-        this.dataNascita = dataNascita;
+    public UtenteGenerico() {
     }
 
-    protected UtenteGenerico() {
-    }
-
-    public UtenteGenerico(String name, String cognome, String email, String numeroTelefono, Date dataNascita) {
-
-    }
-
-    public static <T extends UtenteGenerico> void setUtenteFields(T toUpdate, T sorgente) {
+    public static <T extends UtenteGenerico> void setCampiUtente(T toUpdate, T sorgente) {
         toUpdate.setNome(sorgente.getNome());
         toUpdate.setCognome(sorgente.getCognome());
         toUpdate.setEmail(sorgente.getEmail());
@@ -49,7 +36,7 @@ public abstract class UtenteGenerico {
         toUpdate.setDataNascita(sorgente.getDataNascita());
     }
 
-    public static <T extends UtenteGenerico> void setNonNullFields(T toUpdate, T sorgente) {
+    public static <T extends UtenteGenerico> void setCampiNonNulli(T toUpdate, T sorgente) {
         if (toUpdate.getNome() != null) {
             sorgente.setNome(toUpdate.getNome());
         }

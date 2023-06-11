@@ -1,26 +1,37 @@
 package it.unicam.cs.ids.controllers;
 
 import it.unicam.cs.ids.models.Commerciante;
+import it.unicam.cs.ids.models.PianoVip;
+import it.unicam.cs.ids.models.Tessera;
+import it.unicam.cs.ids.models.Transazione;
 import it.unicam.cs.ids.repositories.CommercianteRepository;
+import it.unicam.cs.ids.repositories.PianoVipRepository;
+import it.unicam.cs.ids.repositories.TesseraRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Date;
 import java.util.List;
 
-import static it.unicam.cs.ids.models.UtenteGenerico.setNonNullFields;
-import static it.unicam.cs.ids.models.UtenteGenerico.setUtenteFields;
+import static it.unicam.cs.ids.controllers.ClienteController.VipAttivo;
+import static it.unicam.cs.ids.models.UtenteGenerico.setCampiNonNulli;
+import static it.unicam.cs.ids.models.UtenteGenerico.setCampiUtente;
 
 @RestController
 @RequestMapping("/commercianti")
 public class CommercianteController {
 
-    private final CommercianteRepository commercianteRepository;
+    @Autowired
+    private CommercianteRepository commercianteRepository;
 
-    public CommercianteController(CommercianteRepository commercianteRepository) {
-        this.commercianteRepository = commercianteRepository;
-    }
+    @Autowired
+    private TesseraRepository tesseraRepository;
+
+    @Autowired
+    private PianoVipRepository pianoVIPRepository;
 
     @GetMapping
-    public List<Commerciante> getCommerciante() {
+    public List<Commerciante> getCommercianti() {
         return commercianteRepository.findAll();
     }
 
@@ -32,15 +43,52 @@ public class CommercianteController {
     @PostMapping
     public void addCommerciante(@RequestBody Commerciante request) {
         Commerciante commerciante = new Commerciante();
-        setAllFields(commerciante, request);
+        setAllCampi(commerciante, request);
         commercianteRepository.save(commerciante);
+    }
+
+    @PostMapping("{commerciante_id}/adesione_piano_vip/{tessera_id}")
+    public void adesionePianoVIP(@PathVariable("tessera_id") Integer id, @PathVariable("commerciante_id") Integer idCommerciante) {
+        Commerciante commerciante;
+        if (commercianteRepository.findById(idCommerciante).isPresent()) {
+            commerciante = commercianteRepository.getReferenceById(idCommerciante);
+        } else {
+            commerciante = null;
+        }
+
+        if (tesseraRepository.findById(id).isPresent()) {
+            Tessera tessera = tesseraRepository.getReferenceById(id);
+
+            if (!VipAttivo(tessera)) {
+                System.out.println(!VipAttivo(tessera));
+                PianoVip toAdd = new PianoVip(true);
+                toAdd.setTessera(tessera);
+                tessera.getListaPianiVip().add(toAdd);
+
+                Transazione puntiVIP = new Transazione();
+                puntiVIP.setImportoTransazione(0.0);
+                puntiVIP.setDescrizioneTransazione("Aggiunta premio iscrizione al programma VIP");
+                puntiVIP.setDataTransazione(new Date(System.currentTimeMillis()));
+                puntiVIP.setTessera(tessera);
+                puntiVIP.setCommerciante(commerciante);
+                puntiVIP.setOffertaUsata(null);
+
+                tessera.getCronologiaTransazioni().add(puntiVIP);
+
+                tessera.aggiuntaPunti(200, 200);
+
+                pianoVIPRepository.save(toAdd);
+            } else {
+                System.out.println("Il cliente ha già un piano VIP attivo");
+            }
+        }
     }
 
     @PutMapping("{commerciante_id}")
     public void updateCommerciante(@PathVariable("commerciante_id") Integer id, @RequestBody Commerciante update) {
         if (commercianteRepository.findById(id).isPresent()) {
             Commerciante commerciante = commercianteRepository.getReferenceById(id);
-            setAllFields(commerciante, update);
+            setAllCampi(commerciante, update);
             commercianteRepository.save(commerciante);
         }
     }
@@ -59,7 +107,7 @@ public class CommercianteController {
     public void patchCommerciante(@PathVariable("idCommerciante") Integer id, @RequestBody Commerciante update) {
         if (commercianteRepository.findById(id).isPresent()) {
             Commerciante commerciante = commercianteRepository.getReferenceById(id);
-            setNonNullFields(commerciante, update);
+            setCampiNonNulli(commerciante, update);
             if (update.getRagioneSociale() != null) {
                 commerciante.setRagioneSociale(update.getRagioneSociale());
             }
@@ -72,8 +120,8 @@ public class CommercianteController {
         }
     }
 
-    public static void setAllFields(Commerciante toUpdate, Commerciante toSet) {
-        setUtenteFields(toUpdate, toSet);
+    public static void setAllCampi(Commerciante toUpdate, Commerciante toSet) {
+        setCampiUtente(toUpdate, toSet);
         toUpdate.setRagioneSociale(toSet.getRagioneSociale());
         toUpdate.setPartitaIVA(toSet.getPartitaIVA());
         toUpdate.setIndirizzo(toSet.getIndirizzo());

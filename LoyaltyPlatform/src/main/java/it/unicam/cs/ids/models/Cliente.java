@@ -8,7 +8,6 @@ import java.util.Objects;
 @Entity
 public class Cliente extends UtenteGenerico {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_cli")
     @SequenceGenerator(name = "seq_cli", allocationSize = 1)
@@ -16,11 +15,6 @@ public class Cliente extends UtenteGenerico {
 
     @OneToOne(cascade = CascadeType.ALL)
     private Tessera tessera;
-
-    public Cliente(Integer id, String nome, String cognome, String email, String numeroTelefono, Date dataNascita) {
-        super(nome, cognome, email, numeroTelefono, dataNascita);
-        this.id = id;
-    }
 
     public Cliente() {
         super();

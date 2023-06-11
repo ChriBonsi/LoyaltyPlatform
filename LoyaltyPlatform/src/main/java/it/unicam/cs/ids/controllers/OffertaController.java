@@ -4,6 +4,7 @@ import it.unicam.cs.ids.models.Offerta;
 import it.unicam.cs.ids.models.Tessera;
 import it.unicam.cs.ids.repositories.OffertaRepository;
 import it.unicam.cs.ids.repositories.TesseraRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,13 +13,12 @@ import java.util.List;
 @RequestMapping("/offerte")
 public class OffertaController {
 
-    private final OffertaRepository offertaRepository;
-    private final TesseraRepository tesseraRepository;
+    @Autowired
+    private OffertaRepository offertaRepository;
 
-    public OffertaController(OffertaRepository offertaRepository, TesseraRepository tesseraRepository) {
-        this.offertaRepository = offertaRepository;
-        this.tesseraRepository = tesseraRepository;
-    }
+    @Autowired
+    private TesseraRepository tesseraRepository;
+
 
     @GetMapping
     public List<Offerta> getOfferte() {
@@ -33,7 +33,7 @@ public class OffertaController {
     @PostMapping
     public void addOfferta(@RequestBody Offerta request) {
         Offerta offerta = new Offerta();
-        this.setAllFields(offerta, request);
+        this.setAllCampi(offerta, request);
 
         List<Tessera> toCheck = tesseraRepository.findAll();
         for (Tessera tessera : toCheck) {
@@ -48,7 +48,7 @@ public class OffertaController {
     public void updateOfferta(@PathVariable("offertaID") Integer id, @RequestBody Offerta updated) {
         if (offertaRepository.findById(id).isPresent()) {
             Offerta offerta = offertaRepository.getReferenceById(id);
-            this.setAllFields(offerta, updated);
+            this.setAllCampi(offerta, updated);
             offertaRepository.save(offerta);
         }
     }
@@ -65,6 +65,11 @@ public class OffertaController {
             }
             offertaRepository.deleteById(id);
         }
+    }
+
+    @DeleteMapping
+    public void deleteAllOfferte() {
+        offertaRepository.deleteAll();
     }
 
     @PatchMapping("{idOfferta}")
@@ -98,12 +103,7 @@ public class OffertaController {
         }
     }
 
-    @DeleteMapping
-    public void deleteAllOfferte() {
-        offertaRepository.deleteAll();
-    }
-
-    private void setAllFields(Offerta offerta, Offerta updated) {
+    private void setAllCampi(Offerta offerta, Offerta updated) {
         offerta.setLivello(updated.getLivello());
         offerta.setDataInizio(updated.getDataInizio());
         offerta.setDataScadenza(updated.getDataScadenza());

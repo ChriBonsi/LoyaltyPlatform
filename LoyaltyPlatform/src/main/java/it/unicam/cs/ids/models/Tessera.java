@@ -25,29 +25,26 @@ public class Tessera {
 
     @Column(length = 3)
     private Integer livello;
+
+    @Column
     private Date dataCreazione;
+
+    @Column
+    private double cashbackDisponibile;
 
     @OneToOne(mappedBy = "tessera")
     private Cliente cliente;
 
+    @OneToMany
+    private List<PianoVip> listaPianiVip = new ArrayList<>();
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "tessera_coupon", joinColumns = @JoinColumn(name = "tessera_id"), inverseJoinColumns = @JoinColumn(name = "coupon_id"))
-    private List<Offerta> listaCoupon;
+    private List<Offerta> listaCoupon = new ArrayList<>();
 
     @OneToMany(mappedBy = "tessera", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference(value = "tessera")
     private List<Transazione> cronologiaTransazioni = new ArrayList<>();
-
-    public Tessera(Integer id, Integer punteggioDisponibile, Integer punteggioTotale, Integer livello, Date dataCreazione, Cliente cliente) {
-        this.id = id;
-        this.punteggioDisponibile = punteggioDisponibile;
-        this.punteggioTotale = punteggioTotale;
-        this.livello = livello;
-        this.dataCreazione = dataCreazione;
-        this.cliente = cliente;
-        this.listaCoupon = new ArrayList<>();
-    }
 
     public Tessera() {
     }
@@ -76,14 +73,6 @@ public class Tessera {
         this.cronologiaTransazioni.clear();
     }
 
-    public String stampaCoupon() {
-        StringBuilder s = new StringBuilder();
-        for (Offerta offerta : listaCoupon) {
-            s.append(offerta.getNomeOfferta()).append("\n");
-        }
-        return s.toString();
-    }
-
     public static Tessera inizializzaNuovaTessera() {
         Tessera tessera = new Tessera();
         tessera.setPunteggioDisponibile(0);
@@ -97,6 +86,21 @@ public class Tessera {
         this.punteggioDisponibile += offsetPunteggio;
         this.punteggioTotale += offsetPositivo;
     }
+
+    public void aggiornaLivello() {
+        int nuovo = punteggioTotale / 100;
+        if (nuovo < 11) {
+            this.livello = nuovo;
+        } else {
+            this.livello = 10;
+        }
+    }
+
+    public void aggiuntaCashback(double offsetCashback) {
+        this.cashbackDisponibile += offsetCashback;
+    }
+
+    //Metodi di utilità
 
     @Override
     public boolean equals(Object o) {
@@ -155,10 +159,6 @@ public class Tessera {
         return cronologiaTransazioni;
     }
 
-    public void setCronologiaTransazioni(List<Transazione> cronologiaTransazioni) {
-        this.cronologiaTransazioni = cronologiaTransazioni;
-    }
-
     public void setPunteggioDisponibile(Integer punteggioDisponibile) {
         this.punteggioDisponibile = punteggioDisponibile;
     }
@@ -169,5 +169,17 @@ public class Tessera {
 
     public void setPunteggioTotale(Integer punteggioTotale) {
         this.punteggioTotale = punteggioTotale;
+    }
+
+    public double getCashbackDisponibile() {
+        return cashbackDisponibile;
+    }
+
+    public void setCashbackDisponibile(double cashbackDisponibile) {
+        this.cashbackDisponibile = cashbackDisponibile;
+    }
+
+    public List<PianoVip> getListaPianiVip() {
+        return listaPianiVip;
     }
 }

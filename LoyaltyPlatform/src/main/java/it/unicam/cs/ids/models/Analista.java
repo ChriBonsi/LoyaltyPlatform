@@ -12,11 +12,6 @@ public class Analista extends UtenteGenerico {
     @SequenceGenerator(name = "seq_an", allocationSize = 1)
     private Integer id;
 
-    public Analista(String nome, String cognome, String email, String numeroTelefono, Date dataNascita, Integer id) {
-        super(nome, cognome, email, numeroTelefono, dataNascita);
-        this.id = id;
-    }
-
     public Analista() {
         super();
     }

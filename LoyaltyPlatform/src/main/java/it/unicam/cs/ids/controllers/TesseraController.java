@@ -3,24 +3,24 @@ package it.unicam.cs.ids.controllers;
 import it.unicam.cs.ids.models.Tessera;
 import it.unicam.cs.ids.repositories.OffertaRepository;
 import it.unicam.cs.ids.repositories.TesseraRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
 import java.util.List;
 
 import static it.unicam.cs.ids.controllers.ClienteController.checkOfferte;
+import static it.unicam.cs.ids.controllers.ClienteController.VipAttivo;
 
 @RestController
 @RequestMapping("/tessere")
 public class TesseraController {
 
-    private final TesseraRepository tesseraRepository;
-    private final OffertaRepository offertaRepository;
+    @Autowired
+    private TesseraRepository tesseraRepository;
 
-    public TesseraController(TesseraRepository tesseraRepository, OffertaRepository offertaRepository) {
-        this.tesseraRepository = tesseraRepository;
-        this.offertaRepository = offertaRepository;
-    }
+    @Autowired
+    private OffertaRepository offertaRepository;
 
     @GetMapping
     public List<Tessera> getTessere() {
@@ -35,10 +35,10 @@ public class TesseraController {
     @PostMapping
     public void addTessera(@RequestBody Tessera request) {
         Tessera tessera = new Tessera();
-        this.setAllFields(tessera, request);
+        this.setAllCampi(tessera, request);
         tessera.setDataCreazione(new Date(System.currentTimeMillis()));
 
-        tessera.setListaCoupon(checkOfferte(tessera.getLivello(), offertaRepository));
+        tessera.setListaCoupon(checkOfferte(tessera.getLivello(), offertaRepository, VipAttivo(tessera)));
 
         tesseraRepository.save(tessera);
     }
@@ -47,7 +47,7 @@ public class TesseraController {
     public void updateTessera(@PathVariable("tesseraID") Integer id, @RequestBody Tessera request) {
         if (tesseraRepository.findById(id).isPresent()) {
             Tessera tessera = tesseraRepository.findById(id).get();
-            this.setAllFields(tessera, request);
+            this.setAllCampi(tessera, request);
             tessera.setDataCreazione(request.getDataCreazione());
 
             tesseraRepository.save(tessera);
@@ -84,7 +84,7 @@ public class TesseraController {
         }
     }
 
-    public void setAllFields(Tessera tessera, Tessera request) {
+    public void setAllCampi(Tessera tessera, Tessera request) {
         tessera.setPunteggioDisponibile(request.getPunteggioDisponibile());
         tessera.setPunteggioTotale(request.getPunteggioTotale());
         tessera.setLivello(request.getLivello());

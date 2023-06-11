@@ -15,6 +15,7 @@ public class Transazione {
     private Integer id;
 
     private final static double PUNTI_PER_EURO = 0.5;
+    private final static double CASHBACK_PER_EURO = 0.01;
 
     @Column(length = 7)
     private Double importoTransazione;
@@ -31,21 +32,42 @@ public class Transazione {
     @JsonBackReference(value = "tessera")
     private Tessera tessera;
 
+    private boolean usaCashback;
 
     @OneToOne
     @Nullable
     private Offerta offertaUsata;
 
-    public Transazione(Integer id, Double importoTransazione, Date dataTransazione, String descrizioneTransazione, @Nullable Offerta offertaUsata) {
-        this.id = id;
-        this.importoTransazione = importoTransazione;
-        this.dataTransazione = dataTransazione;
-        this.descrizioneTransazione = descrizioneTransazione;
-        this.offertaUsata = offertaUsata;
-    }
-
     public Transazione() {
     }
+
+    public Integer convertiInPunti() {
+        return (int) (importoTransazione * PUNTI_PER_EURO);
+    }
+
+    @SuppressWarnings({"ConstantConditions"})
+    public Integer ricalcolaPunteggio(Offerta offerta) {
+        if (offerta == null) {
+            return nettoPositivo(offerta);
+        } else {
+            return nettoPositivo(offerta) - offerta.getPuntiNecessari();
+        }
+    }
+
+    public Integer nettoPositivo(Offerta offerta) {
+        if (offerta == null) {
+            return this.convertiInPunti();
+        } else {
+            return offerta.getPuntiBonus() + (int) (this.convertiInPunti() * offerta.getMoltiplicatore());
+        }
+    }
+
+    public double accumulaCashback() {
+        double importo = this.getImportoTransazione() * CASHBACK_PER_EURO;
+        return Math.round(importo * 100.0) / 100.0;
+    }
+
+    //Metodi di utilità
 
     @Override
     public boolean equals(Object o) {
@@ -116,32 +138,15 @@ public class Transazione {
         this.importoTransazione = importoTransazione;
     }
 
-    public Integer convertiInPunti() {
-        return (int) (importoTransazione * PUNTI_PER_EURO);
-    }
-
-    @SuppressWarnings({"ConstantConditions"})
-    public Integer ricalcolaPunteggio(Offerta offerta) {
-        if (offerta == null) {
-            return nettoPositivo(offerta);
-        } else {
-            return nettoPositivo(offerta) - offerta.getPuntiNecessari();
-        }
-    }
-
-    public Integer nettoPositivo(Offerta offerta) {
-        if (offerta == null) {
-            return this.convertiInPunti();
-        } else {
-            return offerta.getPuntiBonus() + (int) (this.convertiInPunti() * offerta.getMoltiplicatore());
-        }
-    }
-
     public Integer getIdCommerciante() {
         return commerciante.getId();
     }
 
     public Integer getIdTessera() {
         return tessera.getId();
+    }
+
+    public boolean isUsaCashback() {
+        return usaCashback;
     }
 }
